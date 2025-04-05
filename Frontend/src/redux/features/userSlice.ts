@@ -39,15 +39,17 @@ export const userSlice = createSlice({
                 }
             })
         },
-        updateUser: (state, action:PayloadAction<{ id: string; shop: Shop; date: string }>) => {
-            const newUser = action.payload;
-            for (let i = 0; i < state.user.length; i++) {
-                if (state.user[i]._id === newUser.id) {
-                    // to do
-                    break;
-                }
+        updateUser: (state, action: PayloadAction<{ id: string; name: string; telephone: string;}>) => {
+            const { id, name, telephone } = action.payload;
+
+            const userToUpdate = state.user.find(user => user._id === id);
+          
+            if (userToUpdate) {
+              userToUpdate.name = name;
+              userToUpdate.telephone = telephone;
             }
-        },
+          }
+          ,
         fetchUsers: (state, action:PayloadAction<User[]>) => {
             state.user = action.payload;
         }

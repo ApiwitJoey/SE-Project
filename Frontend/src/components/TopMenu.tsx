@@ -75,6 +75,7 @@ export default function TopMenu() {
           <TopMenuItem title="Manage Users" pageRef="/users" />
         )}
         <TopMenuItem title="Home" pageRef="/" />
+        <TopMenuItem title="Profile" pageRef="/profile" />
       </div>
     </div>
   );
