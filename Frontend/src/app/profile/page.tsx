@@ -3,63 +3,67 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import getMyProfile from "@/libs/Auth/GetMyProfile";
+import updateMyProfile from "@/libs/Auth/UpdateMyProfile";
 
 export default function ProfilePage() {
   const router = useRouter();
   const { data: session } = useSession();
   const token = session?.user?.token;
+
+
   const [user, setUser] = useState({
     name: "",
     email: "",
-    telephone_number: "",
+    telephone: "",
     role: "",
   });
 
-  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({ ...user });
 
+  const [isEditing, setIsEditing] = useState(false);
+
   useEffect(() => {
-    fetch("/api/user")
-      .then((response) => response.json())
-      .then((data) => {
-        setUser(data);
-        setFormData(data);
-      })
-      .catch((error) => {
+    const fetchUserData = async () => {
+      if (!token) {
+        console.log("No token available");
+        return;
+      }
+
+      try {
+        const data = await getMyProfile(token);
+        console.log("User data:", data);
+        setUser(data.data);
+        setFormData(data.data);
+      } catch (error) {
         console.error("Error fetching user data:", error);
-      });
-  }, []);
+      }
+    };
+
+    fetchUserData();
+  }, [token]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!token) {
       console.error("No token available.");
       return;
     }
 
-    fetch("/api/user/update", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          setUser(formData);
-          setIsEditing(false);
-        } else {
-          console.error("Error updating user data:", data.message);
-        }
-      })
-      .catch((error) => {
-        console.error("Error saving user data:", error);
-      });
+    try {
+      const updatedUser = await updateMyProfile(token, formData); 
+      if (updatedUser.success) {
+        setUser(updatedUser.data); 
+        setIsEditing(false); 
+      } else {
+        console.error("Error updating user data:", updatedUser.message);
+      }
+    } catch (error) {
+      console.error("Error saving user data:", error);
+    }
   };
 
   const handleCancel = () => {
@@ -69,6 +73,7 @@ export default function ProfilePage() {
 
   const logout = () => {
     console.log("User logged out");
+    router.push("/api/auth/signin"); 
   };
 
   return (
@@ -78,14 +83,70 @@ export default function ProfilePage() {
         <div className="flex items-center gap-4 border-b border-gray-200 pb-4">
           <AccountCircleIcon className="text-green-700" style={{ fontSize: 50 }} />
           <div>
-            <h2 className="text-3xl font-semibold text-green-900">{user.name}</h2>
+            <h2 className="text-3xl font-semibold text-green-900">{formData.name}</h2>
             <p className="text-sm text-gray-500">User Profile Overview</p>
           </div>
         </div>
 
-
         <div className="grid gap-4 text-sm md:text-base text-gray-700">
+          {/* Full Name */}
+          <div className="flex flex-col">
+            <label className="font-medium text-gray-600">Full Name</label>
+            {isEditing ? (
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="border rounded px-3 py-2 mt-1"
+              />
+            ) : (
+              <span className="mt-1">{formData.name}</span>
+            )}
+          </div>
 
+          {/* Email Address */}
+          <div className="flex flex-col">
+            <label className="font-medium text-gray-600">Email Address</label>
+            {isEditing ? (
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="border rounded px-3 py-2 mt-1"
+              />
+            ) : (
+              <span className="mt-1">{formData.email}</span>
+            )}
+          </div>
+
+          {/* Phone Number */}
+          <div className="flex flex-col">
+            <label className="font-medium text-gray-600">Phone Number</label>
+            {isEditing ? (
+              <input
+                type="text"
+                name="telephone"
+                value={formData.telephone}
+                onChange={handleChange}
+                className="border rounded px-3 py-2 mt-1"
+              />
+            ) : (
+              <span className="mt-1">{formData.telephone || "-"}</span>
+            )}
+          </div>
+
+          {/* User Role */}
+          <div className="flex flex-col">
+            <label className="font-medium text-gray-600">User Role</label>
+            <span
+              className={`w-fit self-start mt-1 px-3 py-1 text-sm font-medium text-white rounded 
+              ${formData.role ? (formData.role === "admin" ? "bg-green-800" : "bg-green-500") : "bg-gray-400"}`}
+            >
+              {formData.role ? (formData.role.charAt(0).toUpperCase() + formData.role.slice(1)) : "Unknown Role"}
+            </span>
+          </div>
         </div>
 
         <div className="flex justify-between pt-6">
