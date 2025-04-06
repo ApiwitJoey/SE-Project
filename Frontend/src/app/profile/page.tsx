@@ -1,22 +1,28 @@
-"use client"
+"use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import getMyProfile from "@/libs/Auth/GetMyProfile";
 import updateMyProfile from "@/libs/Auth/UpdateMyProfile";
+import deleteUser from "@/libs/Users/deleteUser";
+import { useDispatch, useSelector } from "react-redux";
+import { removeUser } from "@/redux/features/userSlice";
+import { AppDispatch, RootState } from "@/redux/store";
+import userLogout from "@/libs/Auth/userLogout";
 
 export default function ProfilePage() {
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { data: session } = useSession();
   const token = session?.user?.token;
-
 
   const [user, setUser] = useState({
     name: "",
     email: "",
     telephone: "",
     role: "",
+    _id: "",
   });
 
   const [formData, setFormData] = useState({ ...user });
@@ -54,10 +60,10 @@ export default function ProfilePage() {
     }
 
     try {
-      const updatedUser = await updateMyProfile(token, formData); 
+      const updatedUser = await updateMyProfile(token, formData);
       if (updatedUser.success) {
-        setUser(updatedUser.data); 
-        setIsEditing(false); 
+        setUser(updatedUser.data);
+        setIsEditing(false);
       } else {
         console.error("Error updating user data:", updatedUser.message);
       }
@@ -71,9 +77,25 @@ export default function ProfilePage() {
     setIsEditing(false);
   };
 
-  const logout = () => {
-    console.log("User logged out");
-    router.push("/api/auth/signin"); 
+  const logout = async () => {
+    if (token) {
+      const response = await userLogout();
+      if (response.success) {
+        console.log("User logged out");
+        router.push("/");
+      }
+    }
+  };
+
+  const deleteAcc = async (id: string) => {
+    console.log("User id: " + id)
+    if (id && token) {
+      const response = await deleteUser(id, token);
+      if (response.success) {
+        dispatch(removeUser(id));
+        logout();
+      }
+    }
   };
 
   return (
@@ -81,9 +103,14 @@ export default function ProfilePage() {
       <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-8 space-y-6">
         {/* Profile Section */}
         <div className="flex items-center gap-4 border-b border-gray-200 pb-4">
-          <AccountCircleIcon className="text-green-700" style={{ fontSize: 50 }} />
+          <AccountCircleIcon
+            className="text-green-700"
+            style={{ fontSize: 50 }}
+          />
           <div>
-            <h2 className="text-3xl font-semibold text-green-900">{formData.name}</h2>
+            <h2 className="text-3xl font-semibold text-green-900">
+              {formData.name}
+            </h2>
             <p className="text-sm text-gray-500">User Profile Overview</p>
           </div>
         </div>
@@ -142,9 +169,17 @@ export default function ProfilePage() {
             <label className="font-medium text-gray-600">User Role</label>
             <span
               className={`w-fit self-start mt-1 px-3 py-1 text-sm font-medium text-white rounded 
-              ${formData.role ? (formData.role === "admin" ? "bg-green-800" : "bg-green-500") : "bg-gray-400"}`}
+              ${
+                formData.role
+                  ? formData.role === "admin"
+                    ? "bg-green-800"
+                    : "bg-green-500"
+                  : "bg-gray-400"
+              }`}
             >
-              {formData.role ? (formData.role.charAt(0).toUpperCase() + formData.role.slice(1)) : "Unknown Role"}
+              {formData.role
+                ? formData.role.charAt(0).toUpperCase() + formData.role.slice(1)
+                : "Unknown Role"}
             </span>
           </div>
         </div>
@@ -173,11 +208,19 @@ export default function ProfilePage() {
               Edit Profile
             </button>
           )}
-
+        </div>
+        <div className="flex justify-between">
+          <button
+            className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded shadow-sm"
+            onClick={() => {
+              deleteAcc(user._id);
+            }}
+          >
+            Delete Account
+          </button>
           <button
             onClick={() => {
               logout();
-              router.push("/api/auth/signin");
             }}
             className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded shadow-sm"
           >
