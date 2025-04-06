@@ -209,7 +209,13 @@ const sendEmail = async (options) => {
     text: options.message,
   };
 
-  const info = await transporter.sendMail(message);
+  try {
+    const info = await transporter.sendMail(message);
+    console.log("Message sent: %s", info.messageId);
+  } catch (error) {
+    console.error("Error sending email:", error);
+    throw error; // Re-throw to handle in the calling function
+  }
 
   console.log("Message sent: %s", info.messageId);
 };
