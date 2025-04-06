@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { removeUser } from "@/redux/features/userSlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import userLogout from "@/libs/Auth/userLogout";
+import ConfirmationPopup from "@/components/ConfirmPopup";
 
 export default function ProfilePage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -28,6 +29,8 @@ export default function ProfilePage() {
   const [formData, setFormData] = useState({ ...user });
 
   const [isEditing, setIsEditing] = useState(false);
+
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -185,6 +188,7 @@ export default function ProfilePage() {
         </div>
 
         <div className="flex justify-between pt-6">
+          {/* Edit Profile */}
           {isEditing ? (
             <div className="space-x-2">
               <button
@@ -210,14 +214,16 @@ export default function ProfilePage() {
           )}
         </div>
         <div className="flex justify-between">
+          {/* Delete Account */}
           <button
             className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded shadow-sm"
             onClick={() => {
-              deleteAcc(user._id);
+              setShowPopup(true);
             }}
           >
             Delete Account
           </button>
+          {/* Sign out */}
           <button
             onClick={() => {
               logout();
@@ -227,6 +233,14 @@ export default function ProfilePage() {
             Sign Out
           </button>
         </div>
+        
+        {showPopup && (
+          <ConfirmationPopup
+          title="Are you sure you want to delete your account?"
+          message="your account will be gone forever, there is no redo."
+          onConfirm={()=>deleteAcc(user._id)} 
+          onCancel={()=>setShowPopup(false)}/>
+        )}
       </div>
     </div>
   );
