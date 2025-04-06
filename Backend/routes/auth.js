@@ -5,6 +5,7 @@ const {
   register,
   login,
   getMe,
+  updateMe,
   logout,
   banUser,
   unbanUser,
