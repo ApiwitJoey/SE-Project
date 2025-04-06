@@ -47,13 +47,24 @@ exports.getUser = async (req, res, next) => {
 // @access Private
 exports.deleteUser = async (req, res, next) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
+    const user = await User.findById(req.params.id);
 
     if(!user){
       return res
         .status(404)
         .json({ success: false, message: "Cannot find User with provided ID" });
     }
+
+    if (req.user.id != user.id && req.user.role !== "admin") {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "You are unauthorize to access this information",
+        });
+    }
+
+    await user.deleteOne();
 
     res.status(200).json({ success: true, msg:'Delete successful', data: user });
     
