@@ -9,6 +9,8 @@ const {
   logout,
   banUser,
   unbanUser,
+  forgotPassword,
+  resetPassword
 } = require("../controllers/auth");
 
 router.post("/register", register);
@@ -18,5 +20,7 @@ router.put("/getme", protect, updateMe);
 router.put("/ban/:id", protect, authorize("admin"), banUser);
 router.put("/unban/:id", protect, authorize("admin"), unbanUser);
 router.get("/logout", logout);
+router.post('/forgotpassword', forgotPassword);
+router.put('/resetpassword/:resettoken', resetPassword);
 
 module.exports = router;
