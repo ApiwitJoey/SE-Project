@@ -17,7 +17,7 @@ export default function TopMenu() {
   return (
     <div className="flex items-center justify-between px-6 py-3 bg-white text-emerald-800 shadow-sm z-[20] border-b border-emerald-100">
       <div className="flex items-center space-x-6">
-        {session ? (
+      {session ? (
           <Link 
             href="/api/auth/signout" 
             className="text-emerald-600 hover:text-emerald-800 transition font-medium flex items-center"
@@ -29,7 +29,7 @@ export default function TopMenu() {
           </Link>
         ) : (
           <Link 
-            href="/api/auth/signin" 
+            href="/auth/signin2" 
             className="text-emerald-600 hover:text-emerald-800 transition font-medium flex items-center"
           >
             <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -66,6 +66,8 @@ export default function TopMenu() {
         ) : (
           <TopMenuItem title="My Bookings" pageRef="/mybooking" />
         )}
+
+        
       </div>
       
       <div className="flex items-center space-x-6">
