@@ -203,8 +203,8 @@ const sendEmail = async (option) => {
 
   const message = {
     from: process.env.SMTP_EMAIL,
-    to: options.email,
-    subject: options.subject,
+    to: option.email,
+    subject: option.subject,
     text: ` Hi ${option.toUser} \nOTP : ${option.OTP}`
   };
 
