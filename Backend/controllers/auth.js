@@ -192,7 +192,7 @@ const sendTokenResponse = (user, statusCode, res) => {
 // resetpassword
 
 
-const sendEmail = async (options) => {
+const sendEmail = async (option) => {
   const transporter = nodemailer.createTransport({
     service:'gmail',
     auth: {
@@ -205,7 +205,7 @@ const sendEmail = async (options) => {
     from: process.env.SMTP_EMAIL,
     to: options.email,
     subject: options.subject,
-    text: options.message,
+    text: ` Hi ${option.toUser} \nOTP : ${option.OTP}`
   };
 
   try {
@@ -241,22 +241,17 @@ exports.forgotPassword = async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
     console.log('User saved with reset token');
 
-    // Create reset URL
-    const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetpassword/${resetToken}`;
-    console.log('Reset URL:', resetUrl);
-
-    const message = `You are receiving this email because you (or someone else) have requested the reset of a password. Please make a put request to: \n\n ${resetUrl}`;
-
     try {
       console.log('Attempting to send email...');
       await sendEmail({
         email: user.email,
-        subject: 'Password reset token',
-        message
+        subject: '[SABAAI Massage] Reset Password Code Account: ' + user.name,
+        toUser : user.name,
+        OTP: resetToken
       });
       console.log('Email sent successfully');
 
-      res.status(200).json({ success: true, message: 'Email sent' });
+      res.status(200).json({ success: true, message: `Email sent to ${user.email}` });
     } catch (err) {
       console.error('Error sending email:', err);
 
