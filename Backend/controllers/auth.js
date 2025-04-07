@@ -282,8 +282,11 @@ exports.resetPassword = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(400).json({ success: false, message: 'Invalid token' });
+      return res.status(400).json({ success: false, message: 'The OTP is invalid or has expired. Please try again.' });
     }
+
+    if (req.body.password == "") // is null
+      return res.status(404).json({ success: true, message: 'Please provide a new password' });
 
     // Set new password
     user.password = req.body.password;
@@ -294,6 +297,31 @@ exports.resetPassword = async (req, res, next) => {
 
     // Send JWT
     sendTokenResponse(user, 200, res);
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+// @desc      Validate OTP for password reset
+// @route     GET /api/v1/auth/validate-otp/:resettoken
+// @access    Public
+exports.validateOtp = async (req, res, next) => {
+  // Get hashed token
+  const resetPasswordToken = crypto.createHash('sha256').update(req.params.resettoken).digest('hex');
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'The OTP is invalid or has expired. Please try again.' });
+    }
+
+    // If OTP is valid, return success
+    return res.status(200).json({ success: true, message: 'OTP is valid' });
   } catch (err) {
     next(err);
   }
