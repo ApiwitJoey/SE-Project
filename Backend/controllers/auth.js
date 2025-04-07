@@ -194,16 +194,15 @@ const sendTokenResponse = (user, statusCode, res) => {
 
 const sendEmail = async (options) => {
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
+    service:'gmail',
     auth: {
       user: process.env.SMTP_EMAIL,
       pass: process.env.SMTP_PASSWORD,
-    },
+    }
   });
 
   const message = {
-    from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
+    from: process.env.SMTP_EMAIL,
     to: options.email,
     subject: options.subject,
     text: options.message,
@@ -211,13 +210,12 @@ const sendEmail = async (options) => {
 
   try {
     const info = await transporter.sendMail(message);
-    console.log("Message sent: %s", info.messageId);
+    console.log('Message sent: %s', info.messageId);
+    return info;
   } catch (error) {
-    console.error("Error sending email:", error);
-    throw error; // Re-throw to handle in the calling function
+    console.error('Error sending email:', error);
+    throw error;
   }
-
-  console.log("Message sent: %s", info.messageId);
 };
 
 // @desc      Forgot password
@@ -225,34 +223,42 @@ const sendEmail = async (options) => {
 // @access    Public
 exports.forgotPassword = async (req, res, next) => {
   const { email } = req.body;
+  console.log('Attempting to find user with email:', email);
 
   try {
     const user = await User.findOne({ email });
+    console.log('User found:', user ? 'Yes' : 'No');
 
     if (!user) {
       return res.status(404).json({ success: false, message: 'There is no user with that email' });
     }
 
     // Get reset token
+    console.log('Generating reset token...');
     const resetToken = user.getResetPasswordToken();
+    console.log('Reset token generated');
 
     await user.save({ validateBeforeSave: false });
+    console.log('User saved with reset token');
 
     // Create reset URL
     const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetpassword/${resetToken}`;
+    console.log('Reset URL:', resetUrl);
 
     const message = `You are receiving this email because you (or someone else) have requested the reset of a password. Please make a put request to: \n\n ${resetUrl}`;
 
     try {
+      console.log('Attempting to send email...');
       await sendEmail({
         email: user.email,
         subject: 'Password reset token',
         message
       });
+      console.log('Email sent successfully');
 
       res.status(200).json({ success: true, message: 'Email sent' });
     } catch (err) {
-      console.log(err);
+      console.error('Error sending email:', err);
 
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
@@ -262,6 +268,7 @@ exports.forgotPassword = async (req, res, next) => {
       return res.status(500).json({ success: false, message: 'Email could not be sent' });
     }
   } catch (err) {
+    console.error('Error in forgotPassword:', err);
     next(err);
   }
 };
