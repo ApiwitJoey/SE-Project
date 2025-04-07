@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import InputForm from "@/components/InputForm";
 import { Eye, EyeOff } from "lucide-react";
+import forgotPassword from "@/libs/Auth/forgotPassword";
+import resetPassword from "@/libs/Auth/resetPassword";
+import validateOtp from "@/libs/Auth/validateOtp";
+import { useRouter } from "next/navigation";
 
 export default function ResetPasswordPage() {
+  const router = useRouter(); 
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -13,34 +18,85 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(false);
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     if (step === "email") {
       if (!email.includes("@")) {
         setError("Please enter a valid email address");
+        setLoading(false);
         return;
       }
-      setStep("otp");
+      try {
+        const response = await forgotPassword(email);
+
+        if (!response.success) {
+          setError(response.message + ' ⚠️');
+        } else {
+          setStep("otp");
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false); // Reset loading state after response
+      }
     } else if (step === "otp") {
-      if (otp.length !== 6 || /\D/.test(otp)) {
-        setError("Please enter a valid 6-digit OTP");
-        return;
+      try {
+        const response = await validateOtp(otp);
+
+        if (!response.success) {
+          setError(response.message + ' ⚠️');
+        } else {
+          setStep("reset");
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false); // Reset loading state after response
       }
-      setStep("reset");
     } else if (step === "reset") {
       if (newPassword !== confirmPassword) {
         setError("Passwords do not match");
+        setLoading(false);
         return;
       }
-      alert("Password successfully reset!");
+      try {
+        const response = await resetPassword(otp,newPassword);
+
+        if (!response.success) {
+          setError(response.message + ' ⚠️');
+        } else {
+          setSuccessMessage(true);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false); // Reset loading state after response
+      }
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      {successMessage && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-60 z-50">
+        <div className="bg-white p-6 rounded-lg shadow-xl text-center">
+          <h2 className="text-2xl font-bold text-green-600">✅ Password Reset Successful </h2>
+          <p className="text-gray-600 mt-2">You can now log in with your new password 🔑.</p>
+          <button
+            className="mt-4 px-5 py-2 bg-emerald-500 text-white rounded-md hover:bg-emerald-600 transition"
+            onClick={() => window.location.href = '/auth/signin2'}
+          >
+            Go to Sign-in
+          </button>
+        </div>
+      </div>     
+      )}
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="text-center text-3xl font-extrabold text-emerald-800">
           Password Reset
@@ -51,7 +107,7 @@ export default function ResetPasswordPage() {
         <div className="bg-white py-8 px-4 shadow-lg rounded-lg sm:px-10 border border-emerald-100">
           <div className="mb-4 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
             <p className="text-lg text-yellow-800">
-              {step === "email"
+            {step === "email"
                 ? "Enter your email to receive an OTP."
                 : step === "otp"
                 ? "Check your email for the OTP and enter it below."
@@ -94,7 +150,9 @@ export default function ResetPasswordPage() {
                 <label className="block text-lg font-medium text-gray-700 mb-1">
                   OTP
                 </label>
-                <div className="text-lg text-gray-500">{otp}</div>
+                <div className="text-lg text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap max-w-full" title={otp}>
+                  {otp}
+                </div>
               </div>
             )}
 
@@ -135,15 +193,32 @@ export default function ResetPasswordPage() {
             )}
 
             <div>
-              <button
+            <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition duration-300"
+                disabled={loading} // Disable button while submitting
+                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition duration-300 ${
+                  loading
+                    ? "opacity-50 cursor-not-allowed"
+                    : "opacity-100 cursor-pointer"
+                }`}
               >
-                {step === "email"
-                  ? "Reset My Password"
-                  : step === "otp"
-                  ? "Confirm"
-                  : "Save New Password"}
+                {loading ? (
+                  <div className="flex justify-center items-center">
+                    <svg
+                      className="animate-spin h-5 w-5 mr-3 border-4 border-gray-200 rounded-full border-t-emerald-600"
+                      viewBox="0 0 24 24"
+                    />
+                    Processing...
+                  </div>
+                ) : (
+                  <span>
+                    {step === "email"
+                      ? "Reset My Password"
+                      : step === "otp"
+                      ? "Confirm"
+                      : "Save New Password"}
+                  </span>
+                )}
               </button>
             </div>
           </form>
