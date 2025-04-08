@@ -37,7 +37,12 @@ exports.getShops = async (req, res, next) => {
   console.log(reqQuery);
 
   // Field to exclude
-  const removeField = ["select", "sort", "page", "limit"];
+  const removeField = ["select", "sort", "page", "limit", "name", "openTime", ];
+  // Field for filtering
+  const nameSearch = reqQuery.name;
+  const openTimeSearch = reqQuery.openTime;
+  const closeTimeSearch = reqQuery.closeTime;
+  const timeSearch = reqQuery.time;
 
   // Loop over remove fields and delete them from query
   removeField.forEach((params) => delete reqQuery[params]); // we select and sort later
@@ -49,11 +54,36 @@ exports.getShops = async (req, res, next) => {
     /\b(gt|gte|lt|lte|in)\b/g,
     (match) => `$${match}` // match is the one that we found we then add $ to the front
   );
-  // console.log(queryStr);
-  query = Shop.find(JSON.parse(queryStr)).populate({
+
+  let queryObj = JSON.parse(queryStr);
+
+  if(nameSearch){
+    queryObj.name = {$regex: nameSearch, $options: 'i'};
+  }
+
+  if(openTimeSearch){
+    queryObj.openTime = {$lte: openTimeSearch};
+  }
+
+  if(closeTimeSearch){
+    queryObj.closeTime = {$gte: closeTimeSearch};
+  }
+
+  if(timeSearch){
+    queryObj.openTime = {$lte: timeSearch};
+    queryObj.closeTime = {$gte: timeSearch};
+  }
+
+  query = Shop.find(queryObj).populate({
     path: "reservations",
     select: "date -shop -_id",
   });
+
+  // console.log(queryStr);
+  // query = Shop.find(JSON.parse(queryStr)).populate({
+  //   path: "reservations",
+  //   select: "date -shop -_id",
+  // });
 
   // Select
   if (req.query.select) {
