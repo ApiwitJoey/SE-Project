@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ReservationItem, UpdateReservationDto } from "../../../interfaces";
+import { ReservationItem, Service, UpdateReservationDto } from "../../../interfaces";
 import { Shop } from "../../../interfaces";
 
 type CartState = {
@@ -21,12 +21,13 @@ export const cartSlice = createSlice({
                 })
             state.reservationItems = remainItem
         },
-        updateReservation: (state, action:PayloadAction<{ id: string; shop: Shop; date: string }>) => {
+        updateReservation: (state, action:PayloadAction<{ id: string; shop: Shop; date: string, service:Service }>) => {
             const newReservationItem = action.payload;
             for (let i = 0; i < state.reservationItems.length; i++) {
                 if (state.reservationItems[i]._id === newReservationItem.id) {
                     state.reservationItems[i].shop = newReservationItem.shop;
                     state.reservationItems[i].date = newReservationItem.date;
+                    state.reservationItems[i].service = newReservationItem.service;
                     break;
                 }
             }

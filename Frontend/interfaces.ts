@@ -54,7 +54,8 @@ export interface ShopJson {
 
 export interface UpdateReservationDto {
     shop: string,
-    date: string
+    date: string,
+    service: string
 }
 
 export interface CreateReservatinDto {
