@@ -24,8 +24,14 @@ const BookingPage = () => {
       return;
     }
 
+    if(!selectedServiceId) {
+      setError("You need to select a service");
+      return;
+    }
+
     const body = {
-      date: dayjs(date).format("YYYY/MM/DD")
+      date: dayjs(date).format("YYYY/MM/DD"),
+      service: selectedServiceId
     }
     
     if(selectedShopId){

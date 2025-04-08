@@ -11,6 +11,11 @@ const ReservationSchema = new mongoose.Schema({
     ref: "Shop",
     required: true,
   },
+  service: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Service",
+    required: true,
+  },
   date: {
     type: Date,
     required: true,

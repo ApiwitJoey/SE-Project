@@ -57,7 +57,8 @@ export interface UpdateReservationDto {
 }
 
 export interface CreateReservatinDto {
-    date: string
+    date: string,
+    service: string
 }
 
 export interface ConnectedReservation {
@@ -69,5 +70,3 @@ export interface ConnectedReservation {
     createdAt: string;
     __v: string;
 }
-
-// test commit 2
