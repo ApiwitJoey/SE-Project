@@ -31,6 +31,20 @@ export interface Shop {
     reservations: ReservationItem[]
 }
 
+export interface Service {
+    _id: string,
+    shop: string,
+    name: string,
+    price: number,
+    details: string
+}
+
+export interface ServiceJson {
+    success: boolean,
+    count: number,
+    data: Service[]
+}
+
 export interface ShopJson {
     success: boolean,
     count: number,
