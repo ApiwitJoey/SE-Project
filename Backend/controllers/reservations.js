@@ -43,14 +43,22 @@ exports.getReservations = async (req, res, next) => {
       query = Reservation.find({
         user: req.user.id,
         shop: req.params.shopId,
+      })
+      .populate({
+        path: "shop",
+        select: "name province tel",
       }).populate({
-        path: "shop",
-        select: "name province tel",
-      });
+        path: "service",
+        select: "name price details -_id"
+      });;
     } else {
-      query = Reservation.find({ user: req.user.id }).populate({
+      query = Reservation.find({ user: req.user.id })
+      .populate({
         path: "shop",
         select: "name province tel",
+      }).populate({
+        path: "service",
+        select: "name price details -_id"
       });
     }
   } else {
@@ -60,12 +68,21 @@ exports.getReservations = async (req, res, next) => {
       query = Reservation.find({ shop: req.params.shopId }).populate({
         path: "shop",
         select: "name address telephone openTime closeTime",
-      });
+      })
+      .populate({
+        path: "service",
+        select: "name price details -_id"
+      });;
     } else {
-      query = Reservation.find().populate({
+      query = Reservation.find()
+      .populate({
         path: "shop",
         select: "name address telephone openTime closeTime",
-      });
+      })
+      .populate({
+        path: "service",
+        select: "name price details -_id"
+      });;
     }
   }
 
