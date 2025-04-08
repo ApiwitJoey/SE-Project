@@ -26,12 +26,17 @@ const BookingForm = ({ onSubmit, defaultShopId }: { onSubmit: Function, defaultS
     useEffect(() => {
         const fetchShop = async () => {
             const response: ShopJson = await getAllShops();
-            if (response.success) {
+            if (response.success && response.data.length > 0) {
                 setShops(response.data);
                 if (!defaultShopId && response.data.length > 0) {
                     setSelectedShopId(response.data[0]._id);
                 }
                 setLoading(false);
+            }
+
+            if(response.data.length == 0){
+                setServices(null);
+                setServiceId(null);
             }
         };
         fetchShop();
@@ -105,46 +110,50 @@ const BookingForm = ({ onSubmit, defaultShopId }: { onSubmit: Function, defaultS
                     </Select>
                 </div>
 
-                <div>
-                     <label htmlFor="shop" className="block text-emerald-700 font-medium mb-2">
-                         Select Spa Service:
-                     </label>
-                     <Select
-                         labelId="shop-select-label"
-                         id="shop-select"
-                         value={serviceId}
-                         onChange={(e) => setServiceId(e.target.value as string)}
-                         className="w-full bg-white text-emerald-900 rounded-lg"
-                         sx={{
-                             '& .MuiOutlinedInput-notchedOutline': {
-                                 borderColor: '#059669',
-                             },
-                             '&:hover .MuiOutlinedInput-notchedOutline': {
-                                 borderColor: '#047857',
-                             },
-                         }}
-                     >
-                         {services?.map((service) => (
-                             <MenuItem 
-                                 key={service._id} 
-                                 value={service._id}
-                                 sx={{
-                                     '&:hover': {
-                                         backgroundColor: '#d1fae5',
-                                     },
-                                 }}
-                             >
-                                 <div className="flex items-center">
-                                     <svg className="w-5 h-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                     </svg>
-                                     {service.name} : {service.details}
-                                 </div>
-                             </MenuItem>
-                         ))}
-                     </Select>
-                 </div>
+                {
+                    services && services.length > 0 ? 
+                    <div>
+                    <label htmlFor="shop" className="block text-emerald-700 font-medium mb-2">
+                        Select Spa Service:
+                    </label>
+                    <Select
+                        labelId="shop-select-label"
+                        id="shop-select"
+                        value={serviceId}
+                        onChange={(e) => setServiceId(e.target.value as string)}
+                        className="w-full bg-white text-emerald-900 rounded-lg"
+                        sx={{
+                            '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#059669',
+                            },
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#047857',
+                            },
+                        }}
+                    >
+                        {services?.map((service) => (
+                            <MenuItem 
+                                key={service._id} 
+                                value={service._id}
+                                sx={{
+                                    '&:hover': {
+                                        backgroundColor: '#d1fae5',
+                                    },
+                                }}
+                            >
+                                <div className="flex items-center">
+                                    <svg className="w-5 h-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    {service.name} : {service.details}
+                                </div>
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    </div>
+                    : null
+                }
                 
                 <div>
                     <label className="block text-emerald-700 font-medium mb-2">
