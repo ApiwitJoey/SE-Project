@@ -19,8 +19,26 @@ exports.register = async (req, res, next) => {
     // res.status(200).json({ success: true, token });
     sendTokenResponse(user, 200, res);
   } catch (err) {
-    res.status(400).json({ success: false });
-    console.log(err.stack);
+    if (err.code === 11000) {
+      const field = Object.keys(err.keyPattern)[0]; // e.g. 'email' or 'telephone'
+      return res.status(400).json({
+        success: false,
+        message: `The ${field} is already in use.`
+      });
+    }
+
+    if (err.name === 'ValidationError') {
+      const messages = Object.values(err.errors).map(val => val.message);
+      return res.status(400).json({
+        success: false,
+        message: messages.join(', ')
+      });
+    }
+
+    res.status(400).json({
+      success: false,
+      message: err.message || 'Server error'
+    });
   }
 };
 exports.login = async (req, res, next) => {
