@@ -96,10 +96,16 @@ exports.getShops = async (req, res, next) => {
     }
 
     // Extract all shops from the matching services.
-    let shops = [];
-    services.forEach((service) => {
-      shops.push(service.shop)
-    })
+    const uniqueShopIds = new Set();
+    const shops = [];
+    
+    for (const service of services) {
+      const shopId = service.shop._id.toString();
+      if (!uniqueShopIds.has(shopId)) {
+        uniqueShopIds.add(shopId);
+        shops.push(service.shop);
+      }
+    }
 
     res.status(200).json({
       success: true,
