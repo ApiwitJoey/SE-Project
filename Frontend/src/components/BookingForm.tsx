@@ -20,19 +20,25 @@ const BookingForm = ({ onSubmit, defaultShopId, defaultDate }: { onSubmit: Funct
     const [selectedShopId, setSelectedShopId] = useState<string | null>(defaultShopId || null);
     const [date, setDate] = useState<Dayjs | null>(null);
 
-    useEffect(() => {
-        if (defaultDate) {
-            console.log(defaultDate)
-            const defaultDateObj = dayjs(defaultDate, "YYYY/MM/DD");
-            setDate(defaultDateObj);
-        }
-    }, []);
-
-
     const [loading, setLoading] = useState(true);
 
     const { data: session } = useSession();
     const token = session?.user.token;
+
+    const fetchService = async (ShopId?:string) => {
+        if((selectedShopId || ShopId) && token){
+            const response: ServiceJson = ShopId ? await getAllServicesFromShop(ShopId,token) : await getAllServicesFromShop(selectedShopId,token);
+            if (response.success && response.data.length > 0) {
+                setServices(response.data);
+                setServiceId(response.data[0]._id)
+                setLoading(false);
+            }
+            if(response.data.length == 0){
+                setServices(null);
+                setServiceId(null);
+            }
+        }
+    };
     
     useEffect(() => {
         const fetchShop = async () => {
@@ -41,30 +47,27 @@ const BookingForm = ({ onSubmit, defaultShopId, defaultDate }: { onSubmit: Funct
                 setShops(response.data);
                 if (!defaultShopId && response.data.length > 0) {
                     setSelectedShopId(response.data[0]._id);
+                    await fetchService(response.data[0]._id);
                 }
-                
+                else if(defaultShopId){
+                    await fetchService(defaultShopId)
+                }
+
                 setLoading(false);
             }
         };
         fetchShop();
+        if (defaultDate) {
+            // console.log(defaultDate)
+            const defaultDateObj = dayjs(defaultDate, "YYYY/MM/DD");
+            setDate(defaultDateObj);
+        }
     }, []);
 
     useEffect(() => {
-        const fetchService = async () => {
-            if(selectedShopId && token){
-                const response: ServiceJson = await getAllServicesFromShop(selectedShopId,token);
-                if (response.success && response.data.length > 0) {
-                    setServices(response.data);
-                    setServiceId(response.data[0]._id)
-                    setLoading(false);
-                }
-                if(response.data.length == 0){
-                    setServices(null);
-                    setServiceId(null);
-                }
-            }
-        };
-        fetchService();
+        if(selectedShopId){
+            fetchService(selectedShopId);
+        }
     }, [selectedShopId]);
 
     if (loading) {
