@@ -80,7 +80,9 @@ exports.getShops = async (req, res, next) => {
   // (MIGHT NEED FIXING LATER, BUT I'M TOO FUCKING LAZY FOR THIS SHIT RN.)
   // If you want to make it work with other query like 'select', then be my guest. GOOD LUCK
   // Might need to optimize later or just FUCK IT. "If it works, it works"
+  // Example usage: GET /api/v1/shops?type=Leg or /api/v1/shops?type=Back
   if(typeSearch){ 
+    // Find services with the selected type first.
     const services = await Service.find({
       type: typeSearch
     }).populate({
@@ -92,6 +94,8 @@ exports.getShops = async (req, res, next) => {
         msg: "No shops found with the service of the selected type."
       })
     }
+
+    // Extract all shops from the matching services.
     let shops = [];
     services.forEach((service) => {
       shops.push(service.shop)
