@@ -18,8 +18,6 @@ const EditBookingPage = ({ params }: { params: { id: string } }) => {
   const defaultShopId = searchParams.get("shopId") || null;
   const defaultDate = searchParams.get("date") || null;
 
-  const [shops, setShops] = useState<Shop[] | null>(null);
-
   const { data: session } = useSession();
   const token = session?.user.token;
   const router = useRouter();
@@ -41,7 +39,7 @@ const EditBookingPage = ({ params }: { params: { id: string } }) => {
           id: reservationId,
           shop: selectedShop,
           service: selectedService,
-          date: dayjs(date).format("YYYY/MM/DD"),
+          date: dayjs(date).format("YYYY-MM-DDTHH:mm:ss"),
         };
         dispatch(updateReservationRedux(updateReduxBody));
       }
@@ -49,7 +47,7 @@ const EditBookingPage = ({ params }: { params: { id: string } }) => {
       const body: UpdateReservationDto = {
         shop: selectedShopId,
         service: selectedServiceId,
-        date: dayjs(date).format("YYYY/MM/DD"),
+        date: dayjs(date).format("YYYY-MM-DDTHH:mm:ss"),
       };
       
       await updateReservation(reservationId, token, body);

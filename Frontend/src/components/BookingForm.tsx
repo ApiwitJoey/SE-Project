@@ -11,6 +11,7 @@ import { ServiceJson, Shop, ShopJson } from "../../interfaces";
 import { Service } from "../../interfaces";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useSession } from "next-auth/react";
+import { DateTimePicker } from "@mui/x-date-pickers";
 
 const BookingForm = ({ onSubmit, defaultShopId, defaultDate }: { onSubmit: Function, defaultShopId?: string | null, defaultDate?: string | null }) => {
 
@@ -59,7 +60,7 @@ const BookingForm = ({ onSubmit, defaultShopId, defaultDate }: { onSubmit: Funct
         fetchShop();
         if (defaultDate) {
             // console.log(defaultDate)
-            const defaultDateObj = dayjs(defaultDate, "YYYY/MM/DD");
+            const defaultDateObj = dayjs(defaultDate, "YYYY-MM-DDTHH:mm:ss");
             setDate(defaultDateObj);
         }
     }, []);
@@ -172,7 +173,7 @@ const BookingForm = ({ onSubmit, defaultShopId, defaultDate }: { onSubmit: Funct
                         Select Date:
                     </label>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker 
+                        <DateTimePicker 
                             className="w-full"
                             value={date} 
                             onChange={(newDate) => setDate(newDate)}

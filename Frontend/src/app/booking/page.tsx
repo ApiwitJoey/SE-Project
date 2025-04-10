@@ -30,7 +30,7 @@ const BookingPage = () => {
     }
 
     const body = {
-      date: dayjs(date).format("YYYY/MM/DD"),
+      date: dayjs(date).format("YYYY-MM-DDTHH:mm:ss"),
       service: selectedServiceId
     }
     

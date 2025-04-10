@@ -1,5 +1,6 @@
 const Reservation = require("../models/Reservation");
 const Shop = require("../models/Shop");
+const moment = require('moment'); 
 
 // @desc Get one reservation
 // @route GET /api/v1/reservations/:id
@@ -116,6 +117,9 @@ exports.createReservation = async (req, res, next) => {
         message: `No shop with the id of ${req.params.shopId}`,
       });
     }
+
+    req.body.date = moment.utc(req.body.date).toDate();
+
     console.log(req.body);
 
     // add user Id to req.body
@@ -155,6 +159,8 @@ exports.updateReservation = async (req, res, next) => {
         message: `No reservation with the id of ${req.params.id}`,
       });
     }
+
+    req.body.date = moment.utc(req.body.date).toDate();
 
     // Make sure user is the reservation owner
     if (
