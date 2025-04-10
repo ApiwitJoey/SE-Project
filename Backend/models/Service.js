@@ -6,6 +6,7 @@ const ServiceSchema = new mongoose.Schema({
     shop: { type: mongoose.Schema.Types.ObjectId, ref: 'Shop' },
     name: String,
     price: Number,
+    type: String,
     details: String
 })
 

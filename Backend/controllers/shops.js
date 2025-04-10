@@ -1,5 +1,6 @@
 const Shop = require("../models/Shop");
 const Reservation = require("../models/Reservation");
+const Service = require("../models/Service");
 
 // @desc Get one shop
 // @route GET /api/v1/shops/:id
@@ -43,6 +44,7 @@ exports.getShops = async (req, res, next) => {
   const openTimeSearch = reqQuery.openTime;
   const closeTimeSearch = reqQuery.closeTime;
   const timeSearch = reqQuery.time;
+  const typeSearch = reqQuery.type;
 
   // Loop over remove fields and delete them from query
   removeField.forEach((params) => delete reqQuery[params]); // we select and sort later
@@ -74,6 +76,35 @@ exports.getShops = async (req, res, next) => {
     queryObj.closeTime = {$gte: timeSearch};
   }
 
+  // Find the service first, then take all the shops from those services and return the shops. 
+  // (MIGHT NEED FIXING LATER, BUT I'M TOO FUCKING LAZY FOR THIS SHIT RN.)
+  // If you want to make it work with other query like 'select', then be my guest. GOOD LUCK
+  // Might need to optimize later or just FUCK IT. "If it works, it works"
+  if(typeSearch){ 
+    const services = await Service.find({
+      type: typeSearch
+    }).populate({
+      path: "shop",
+    });
+    if(!services || services.length === 0){
+      res.status(404).json({
+        success: false,
+        msg: "No shops found with the service of the selected type."
+      })
+    }
+    let shops = [];
+    services.forEach((service) => {
+      shops.push(service.shop)
+    })
+
+    res.status(200).json({
+      success: true,
+      count: shops.length,
+      data: shops,
+    });
+    return;
+  }
+
   query = Shop.find(queryObj).populate({
     path: "reservations",
     select: "date -shop -_id",
@@ -84,6 +115,7 @@ exports.getShops = async (req, res, next) => {
   //   path: "reservations",
   //   select: "date -shop -_id",
   // });
+
 
   // Select
   if (req.query.select) {
