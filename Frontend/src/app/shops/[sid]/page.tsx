@@ -14,6 +14,7 @@ export default function ShopDetailPage({
 }) {
     const { data: session } = useSession();
     const token = session?.user.token;
+    const role = session?.user.role;
     const router = useRouter();
     const [shopDetail, setShopDetail] = useState<Shop | null>(null);
     const [services, setServices] = useState<Service[] | null>(null);
@@ -152,9 +153,23 @@ export default function ShopDetailPage({
 
                 {/* Services Section */}
                 <div className="bg-white rounded-xl shadow-lg p-6 border border-emerald-100">
-                    <h2 className="text-2xl font-semibold text-emerald-700 mb-6">
-                        Our Services
-                    </h2>
+                    <div className="flex items-start gap-3">
+                        <h2 className="text-2xl font-semibold text-emerald-700 mb-6">
+                            Our Services
+                        </h2>
+                        {
+                            role == 'admin' && (
+                                <button
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-1 px-2 rounded-xl shadow-md transition duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2"
+                                    onClick={() => {
+                                        router.push(`/shops/${shopDetail._id}/edit`);
+                                    }}
+                                >
+                                    Add new service
+                                </button>
+                            )
+                        }
+                    </div>
                     {services?.length ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {services.map((service) => (

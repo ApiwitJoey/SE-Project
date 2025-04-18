@@ -73,3 +73,11 @@ export interface ConnectedReservation {
      service: Service,
      __v: string
 }
+
+export interface CreateServiceDto { 
+    shop: string,
+    name: string,
+    price: number,
+    details: string
+}
+

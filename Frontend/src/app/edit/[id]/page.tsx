@@ -1,6 +1,6 @@
 'use client'
-import { useEffect, useState } from "react";
-import { Shop, ShopJson, UpdateReservationDto } from "../../../../interfaces";
+import { useState } from "react";
+import { UpdateReservationDto } from "../../../../interfaces";
 import dayjs from "dayjs";
 import updateReservation from "@/libs/Reservations/updateReservation";
 import { useSession } from "next-auth/react";
