@@ -165,7 +165,7 @@ export default function ShopDetailPage({
                                         router.push(`/shops/${shopDetail._id}/edit`);
                                     }}
                                 >
-                                    Add new service
+                                    Edit Shop Services
                                 </button>
                             )
                         }

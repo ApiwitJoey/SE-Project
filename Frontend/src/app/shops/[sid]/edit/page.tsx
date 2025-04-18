@@ -9,7 +9,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import EditShopServiceForm from "@/components/EditShopServiceForm";
 import createService from "@/libs/Service/createService";
 
-const EditShopPage = ({ params } : { params: { sid: string }}) => {
+const EditShopService = ({ params } : { params: { sid: string }}) => {
     const [error, setError] = useState("");
     const { data: session } = useSession();
     const token = session?.user.token;
@@ -18,6 +18,10 @@ const EditShopPage = ({ params } : { params: { sid: string }}) => {
     const [shopDetail, setShopDetail] = useState<Shop | null>(null);
     const [services, setServices] = useState<Service[] | null>(null);
     const [loading, setLoading] = useState(true);
+
+    if(role != "admin"){
+        router.push('/');
+    }
 
     useEffect(() => {
         const fetchShop = async () => {
@@ -149,4 +153,4 @@ const EditShopPage = ({ params } : { params: { sid: string }}) => {
   )
 }
 
-export default EditShopPage
+export default EditShopService
