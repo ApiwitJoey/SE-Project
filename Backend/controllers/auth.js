@@ -234,7 +234,7 @@ const sendEmail = async (option) => {
     <h2 style="text-align: center; font-size: 24px; color: #065f46; margin-bottom: 20px;">Hi ${option.toUser},</h2>
     
     <p style="font-size: 16px; line-height: 1.6; color: #374151; text-align: center;">
-      You’ve enabled <strong>2-Step Verification</strong> on your account.
+      You've enabled <strong>2-Step Verification</strong> on your account.
     </p>
 
     <div style="background-color: #ecfdf5; border: 1px dashed #10b981; padding: 20px; margin: 30px 0; border-radius: 8px; text-align: center;">
@@ -243,7 +243,7 @@ const sendEmail = async (option) => {
     </div>
 
     <p style="font-size: 15px; line-height: 1.6; color: #4b5563;">
-      You’ll need this 6-digit security code to confirm sensitive actions such as signing in. Please enter it in the verification field provided.
+      You'll need this 6-digit security code to confirm sensitive actions such as signing in. Please enter it in the verification field provided.
     </p>
 
     <p style="font-size: 16px; color: #10b981; font-weight: bold; margin-top: 30px;">Sabaai</p>
@@ -279,25 +279,24 @@ exports.forgotPassword = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'There is no user with that email' });
     }
 
-    // Get reset token
-    console.log('Generating reset token...');
-    const resetToken = user.getResetPasswordToken();
-    console.log('Reset token generated');
+    // Get reset OTP
+    console.log('Generating reset OTP...');
+    const otp = user.getResetPasswordToken();
+    console.log('Reset OTP generated');
 
     await user.save({ validateBeforeSave: false });
-    console.log('User saved with reset token');
+    console.log('User saved with reset OTP');
 
     try {
       console.log('Attempting to send email...');
       await sendEmail({
         email: user.email,
-        subject: '[SABAAI Massage] Reset Password Code Account: ' + user.name,
-        toUser : user.name,
-        OTP: resetToken
+        subject: 'Password Reset OTP',
+        message: `Your password reset OTP is: ${otp}\n\nThis OTP will expire in 10 minutes.`
       });
       console.log('Email sent successfully');
 
-      res.status(200).json({ success: true, message: `Email sent to ${user.email}` });
+      res.status(200).json({ success: true, message: 'Email sent' });
     } catch (err) {
       console.error('Error sending email:', err);
 
@@ -315,11 +314,11 @@ exports.forgotPassword = async (req, res, next) => {
 };
 
 // @desc      Reset password
-// @route     PUT /api/v1/auth/resetpassword/:resettoken
+// @route     PUT /api/v1/auth/resetpassword/:otp
 // @access    Public
 exports.resetPassword = async (req, res, next) => {
-  // Get hashed token
-  const resetPasswordToken = crypto.createHash('sha256').update(req.params.resettoken).digest('hex');
+  // Get hashed OTP
+  const resetPasswordToken = crypto.createHash('sha256').update(req.params.otp).digest('hex');
 
   try {
     const user = await User.findOne({
@@ -328,11 +327,8 @@ exports.resetPassword = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(400).json({ success: false, message: 'The OTP is invalid or has expired. Please try again.' });
+      return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
     }
-
-    if (req.body.password == "") // is null
-      return res.status(404).json({ success: true, message: 'Please provide a new password' });
 
     // Set new password
     user.password = req.body.password;

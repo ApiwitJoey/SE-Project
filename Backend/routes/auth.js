@@ -22,7 +22,7 @@ router.put("/ban/:id", protect, authorize("admin"), banUser);
 router.put("/unban/:id", protect, authorize("admin"), unbanUser);
 router.get("/logout", logout);
 router.post('/forgotpassword', forgotPassword);
-router.put('/resetpassword/:resettoken', resetPassword);
+router.put('/resetpassword/:otp', resetPassword);
 router.get('/validate-otp/:resettoken',validateOtp)
 
 module.exports = router;
