@@ -291,8 +291,9 @@ exports.forgotPassword = async (req, res, next) => {
       console.log('Attempting to send email...');
       await sendEmail({
         email: user.email,
-        subject: 'Password Reset OTP',
-        message: `Your password reset OTP is: ${otp}\n\nThis OTP will expire in 10 minutes.`
+        subject: '[SABAAI Massage] Reset Password Code Account: ' + user.name,
+        toUser : user.name,
+        OTP: resetToken
       });
       console.log('Email sent successfully');
 
