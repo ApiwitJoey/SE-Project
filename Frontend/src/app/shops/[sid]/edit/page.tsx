@@ -8,13 +8,17 @@ import { useRouter } from "next/navigation";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditShopServiceForm from "@/components/EditShopServiceForm";
 import createService from "@/libs/Service/createService";
+import deleteService from "@/libs/Service/deleteService";
 
 const EditShopService = ({ params } : { params: { sid: string }}) => {
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState<string>("");
+
     const { data: session } = useSession();
     const token = session?.user.token;
     const role = session?.user.role;
     const router = useRouter();
+
     const [shopDetail, setShopDetail] = useState<Shop | null>(null);
     const [services, setServices] = useState<Service[] | null>(null);
     const [loading, setLoading] = useState(true);
@@ -33,27 +37,43 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                     setShopDetail(shopDetail.data);
                     setServices(shopServices.data);
                 }
-            } catch (error) {
-                console.error("Error fetching shop details:", error);
+            } catch (err) {
+                const errMessage = err instanceof Error ? err.message : "Unexpected error occurred";
+                setError(errMessage);
             } finally {
                 setLoading(false);
             }
         };
         fetchShop();
-    }, [params.sid, token]);
+    }, []);
 
     const addNewService = async ( serviceName:string, price:string, detail:string ) => {
+        setError("");
+        setSuccess("");
         const parsedPrice = parseFloat(price);
 
+        if(!serviceName){
+            setError("Please enter a service name.");
+            return;
+        }
+
+        if(!price){
+            setError("Please enter a price.");
+            return;
+        }
+
+        if(!detail){
+            setError("Please enter the service details.");
+            return;
+        }
+
         if(!shopDetail?._id){
-            setError("shopId not found, can't Add New Service");
-            console.log("shopId not found");
+            setError("Shop ID not found. Cannot add a new service.");
             return;
         }
 
         if(!token){
-            setError("token not found, can't Add New Service");
-            console.log("token not found");
+            setError("Token not found. Cannot add a new service.");
             return;
         }
 
@@ -64,15 +84,36 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
             details: detail
         }
         try {
-            setLoading(true);
             const response = await createService(shopDetail?._id, token, body);
-            const shopServices: ServiceJson =
-                        await getAllServicesFromShop(params.sid, token);
-            setServices(shopServices.data);
-        } catch (error) {
-            setError("Failed to Create service");
-        } finally {
-            setLoading(false);
+            setServices(prevServices => {
+                if(!prevServices) return prevServices;
+                return [...prevServices, response.data];
+            })
+            setSuccess("Service added successfully.");
+        } catch (err) {
+            const errMessage = err instanceof Error ? err.message : "Unexpected error occurred";
+            setError(errMessage);
+        }
+    }
+
+    const handleDelete = async (serviceId: string) => {
+        setError("");
+        setSuccess("");
+
+        if(!token){
+            setError("token not found, can't Add New Service");
+            return;
+        }
+
+        try {
+            await deleteService(serviceId,token);
+            setServices(prevServices => {
+                if (!prevServices) return prevServices;
+                return prevServices.filter(service => service._id !== serviceId);
+            });
+        } catch (err) {
+            const errMessage = err instanceof Error ? err.message : "Unexpected error occurred";
+            setError(errMessage);
         }
     }
 
@@ -108,13 +149,21 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
             <div className="w-24 h-1 bg-emerald-400 mx-auto"></div>
         </div>
 
-        {error && (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
-            <p className="font-medium">{error}</p>
-          </div>
-        )}
-        
-        <EditShopServiceForm onSubmit={addNewService}/>
+        <div className="max-w-md mx-auto"> 
+            {success && (
+                <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded">
+                    <p className="font-medium">{success}</p>
+                </div>
+            )}
+            
+            {error && (
+            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+                <p className="font-medium">{error}</p>
+            </div>
+            )}
+
+            <EditShopServiceForm onSubmit={addNewService} />
+        </div>
 
         {/* Services Section */}
         <div className="bg-white rounded-xl shadow-lg p-6 border border-emerald-100">
@@ -128,7 +177,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                     {services.map((service) => (
                         <div
                             key={service._id}
-                            className="bg-emerald-50 rounded-lg p-5 border border-emerald-100 hover:shadow-md transition-shadow"
+                            className="bg-emerald-50 rounded-lg p-5 border border-emerald-100 hover:shadow-md transition-shadow flex flex-col"
                         >
                             <h3 className="text-xl font-medium text-emerald-800 mb-2">
                                 {service.name}
@@ -136,9 +185,15 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                             <p className="text-emerald-700 mb-3">
                                 {service.details}
                             </p>
-                            <p className="text-emerald-600 font-bold">
+                            <p className="text-emerald-600 font-bold mb-3">
                                 ฿{service.price}
                             </p>
+                            <button 
+                                onClick={(e) => {handleDelete(service._id)}}
+                                className="mt-auto ml-auto w-fit px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors"
+                            >
+                                Delete
+                            </button>
                         </div>
                     ))}
                 </div>
