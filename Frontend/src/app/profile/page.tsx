@@ -138,17 +138,9 @@ export default function ProfilePage() {
           {/* Email Address */}
           <div className="flex flex-col">
             <label className="font-medium text-gray-600">Email Address</label>
-            {isEditing ? (
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="border rounded px-3 py-2 mt-1"
-              />
-            ) : (
+            
               <span className="mt-1">{formData.email}</span>
-            )}
+            
           </div>
 
           {/* Phone Number */}
