@@ -293,7 +293,7 @@ exports.forgotPassword = async (req, res, next) => {
         email: user.email,
         subject: '[SABAAI Massage] Reset Password Code Account: ' + user.name,
         toUser : user.name,
-        OTP: resetToken
+        OTP: otp
       });
       console.log('Email sent successfully');
 
