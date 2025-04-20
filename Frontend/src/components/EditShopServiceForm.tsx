@@ -2,15 +2,15 @@
 import { FilledInput, FormControl, InputAdornment, InputLabel, TextField } from "@mui/material"
 import { useState } from "react";
 
-const EditShopServiceForm = ({ onSubmit } : { onSubmit: Function }) => {
+const EditShopServiceForm = ({ onSubmit, header } : { onSubmit: Function, header:string }) => {
 
     const [serviceName, setServiceName] = useState("");
     const [price, setPrice] = useState<string>("");
     const [detail, setDetail] = useState("")
 
     return (
-        <div className="max-w-md mx-auto bg-white shadow-lg rounded-xl p-6 border border-emerald-100 my-6">
-            <h1 className="text-2xl font-bold text-emerald-800">Add New Sevice</h1>
+        <div className="max-w-md mx-auto bg-white shadow-lg rounded-xl p-6 border border-emerald-100 mb-6">
+            <h1 className="text-2xl font-bold text-emerald-800">{header}</h1>
 
             <div className="h-1 w-full bg-emerald-500 rounded mb-4 mt-1"></div>
 

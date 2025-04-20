@@ -3,14 +3,20 @@ import { useSession } from "next-auth/react";
 import getShop from "@/libs/Shops/getShop";
 import getAllServicesFromShop from "@/libs/Service/getServiceFromShop";
 import { useEffect, useState } from "react";
-import { Service, ServiceJson, Shop, CreateServiceDto } from "../../../../../interfaces";
+import { Service, ServiceJson, Shop, CreateServiceDto, updateServiceDto } from "../../../../../interfaces";
 import { useRouter } from "next/navigation";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditShopServiceForm from "@/components/EditShopServiceForm";
 import createService from "@/libs/Service/createService";
 import deleteService from "@/libs/Service/deleteService";
+import updateService from "@/libs/Service/updateService";
+import Modal from "@/components/Modal";
 
 const EditShopService = ({ params } : { params: { sid: string }}) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentEditedServiceId, setCurrentEditedServiceId] = useState("")
+    const [editedError, seteditedError] = useState("");
+
     const [error, setError] = useState("");
     const [success, setSuccess] = useState<string>("");
 
@@ -117,6 +123,41 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
         }
     }
 
+    const handleEdit = async ( serviceName:string, price:string, detail:string ) => {
+        if(!serviceName && !price && !detail){
+            seteditedError("Please enter some informatin.");
+            return;
+        }
+
+        if(!token){
+            seteditedError("Token not found. Cannot add a new service.");
+            return;
+        }
+
+        const body: updateServiceDto = {
+            name: serviceName || undefined,
+            price: price ? parseFloat(price) : undefined,
+            details: detail || undefined,
+          };
+
+        try {
+            const response = await updateService(currentEditedServiceId, token, body);
+            setServices(prevServices => {
+                if(!prevServices) return prevServices;
+                return prevServices.map(service => {
+                    if(service._id == currentEditedServiceId){
+                        return response.data
+                    } 
+                    return service
+                })
+            })
+            setIsModalOpen(false);
+        } catch (err) {
+            const errMessage = err instanceof Error ? err.message : "Unexpected error occurred";
+            setError(errMessage);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center min-h-screen">
@@ -138,73 +179,93 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
               </div>
           </div>
       );
-  }
+    }
   return (
     <main className="min-h-screen bg-gradient-to-b from-emerald-50 to-white py-10 px-4 sm:px-6">
-    <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-emerald-800 mb-3">
-                {shopDetail.name}
-            </h1>
-            <div className="w-24 h-1 bg-emerald-400 mx-auto"></div>
-        </div>
+        <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-10">
+                <h1 className="text-4xl font-bold text-emerald-800 mb-3">
+                    {shopDetail.name}
+                </h1>
+                <div className="w-24 h-1 bg-emerald-400 mx-auto"></div>
+            </div>
 
-        <div className="max-w-md mx-auto"> 
-            {success && (
-                <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded">
-                    <p className="font-medium">{success}</p>
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                {editedError && (
+                    <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
+                        <p className="font-medium">{editedError}</p>
+                    </div>
+                )}
+                <EditShopServiceForm onSubmit={handleEdit} header="Edit Sevice" />
+            </Modal>
+
+            <div className="max-w-md mx-auto"> 
+                {success && (
+                    <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded">
+                        <p className="font-medium">{success}</p>
+                    </div>
+                )}
+                
+                {error && (
+                    <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+                        <p className="font-medium">{error}</p>
+                    </div>
+                )}
+
+                <EditShopServiceForm onSubmit={addNewService} header="Add New Sevice" />
+            </div>
+
+            {/* Services Section */}
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-emerald-100">
+                <div className="flex items-start gap-3">
+                    <h2 className="text-2xl font-semibold text-emerald-700 mb-6">
+                        Current Services
+                    </h2>
                 </div>
-            )}
-            
-            {error && (
-            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
-                <p className="font-medium">{error}</p>
-            </div>
-            )}
-
-            <EditShopServiceForm onSubmit={addNewService} />
-        </div>
-
-        {/* Services Section */}
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-emerald-100">
-            <div className="flex items-start gap-3">
-                <h2 className="text-2xl font-semibold text-emerald-700 mb-6">
-                    Current Services
-                </h2>
-            </div>
-            {services?.length ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {services.map((service) => (
-                        <div
-                            key={service._id}
-                            className="bg-emerald-50 rounded-lg p-5 border border-emerald-100 hover:shadow-md transition-shadow flex flex-col"
-                        >
-                            <h3 className="text-xl font-medium text-emerald-800 mb-2">
-                                {service.name}
-                            </h3>
-                            <p className="text-emerald-700 mb-3">
-                                {service.details}
-                            </p>
-                            <p className="text-emerald-600 font-bold mb-3">
-                                ฿{service.price}
-                            </p>
-                            <button 
-                                onClick={(e) => {handleDelete(service._id)}}
-                                className="mt-auto ml-auto w-fit px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors"
+                {services?.length ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {services.map((service) => (
+                            <div
+                                key={service._id}
+                                className="bg-emerald-50 rounded-lg p-5 border border-emerald-100 hover:shadow-md transition-shadow flex flex-col"
                             >
-                                Delete
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <p className="text-emerald-600 text-center py-8">
-                    No services available at this time
-                </p>
-            )}
+                                <h3 className="text-xl font-medium text-emerald-800 mb-2">
+                                    {service.name}
+                                </h3>
+                                <p className="text-emerald-700 mb-3">
+                                    {service.details}
+                                </p>
+                                <p className="text-emerald-600 font-bold mb-3">
+                                    ฿{service.price}
+                                </p>
+
+                                <div className="mt-auto ml-auto flex flex-row gap-2">
+                                    <button onClick={(e) => {setIsModalOpen(true); setCurrentEditedServiceId(service._id); seteditedError("");}} className="px-5 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors flex items-center">
+                                        <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Edit
+                                    </button>
+                                    
+                                    <button onClick={(e) => {handleDelete(service._id)}} className="flex w-fit px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors">
+                                        <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0h8a1 1 0 001-1V5a1 1 0 00-1-1H8a1 1 0 00-1 1v1z" />
+                                        </svg>
+                                        Delete
+                                    </button>
+                                </div>
+
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-emerald-600 text-center py-8">
+                        No services available at this time
+                    </p>
+                )}
+            </div>
         </div>
-    </div>
-</main>
+    </main>
   )
 }
 

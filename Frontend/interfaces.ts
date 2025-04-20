@@ -81,3 +81,10 @@ export interface CreateServiceDto {
     details: string
 }
 
+export interface updateServiceDto {
+    shop?: string,
+    name?: string,
+    price?: number,
+    details?: string
+}
+
