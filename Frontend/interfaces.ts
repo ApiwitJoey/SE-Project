@@ -65,13 +65,13 @@ export interface CreateReservatinDto {
 
 export interface ConnectedReservation {
     userName: string,
-     _id: string,
-     user: string,
-     shop: Shop,
-     date: string,
-     createdAt: string,
-     service: Service,
-     __v: string
+    _id: string,
+    user: string,
+    shop: Shop,
+    date: string,
+    createdAt: string,
+    service: Service,
+    __v: string
 }
 
 export interface CreateServiceDto { 
