@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 import getShop from "@/libs/Shops/getShop";
 import getAllServicesFromShop from "@/libs/Service/getServiceFromShop";
 import { useEffect, useState } from "react";
-import { Service, ServiceJson, Shop, CreateServiceDto, updateServiceDto } from "../../../../../interfaces";
+import { Service, ServiceJson, Shop, CreateServiceDto, UpdateServiceDto } from "../../../../../interfaces";
 import { useRouter } from "next/navigation";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditShopServiceForm from "@/components/EditShopServiceForm";
@@ -134,7 +134,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
             return;
         }
 
-        const body: updateServiceDto = {
+        const body: UpdateServiceDto = {
             name: serviceName || undefined,
             price: price ? parseFloat(price) : undefined,
             details: detail || undefined,

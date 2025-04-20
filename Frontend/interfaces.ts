@@ -81,7 +81,7 @@ export interface CreateServiceDto {
     details: string
 }
 
-export interface updateServiceDto {
+export interface UpdateServiceDto {
     shop?: string,
     name?: string,
     price?: number,

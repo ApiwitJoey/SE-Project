@@ -1,6 +1,6 @@
-import { updateServiceDto } from "../../../interfaces";
+import { UpdateServiceDto } from "../../../interfaces";
 
-export default async function updateService(serviceId: string, token: string, body: updateServiceDto) {
+export default async function updateService(serviceId: string, token: string, body: UpdateServiceDto) {
   
     const response = await fetch(`${process.env.BACKEND_URL}/api/v1/services/${serviceId}`, {
       method: 'PUT',
