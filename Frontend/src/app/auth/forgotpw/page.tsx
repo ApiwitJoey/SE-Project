@@ -65,6 +65,11 @@ export default function ResetPasswordPage() {
         setLoading(false);
         return;
       }
+      if (newPassword.length < 6) {
+        setError("Password must be at least 6 characters long");
+        setLoading(false);
+        return;
+      }
       try {
         const response = await resetPassword(otp,newPassword);
 
