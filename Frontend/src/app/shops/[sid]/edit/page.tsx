@@ -11,11 +11,9 @@ import createService from "@/libs/Service/createService";
 import deleteService from "@/libs/Service/deleteService";
 import updateService from "@/libs/Service/updateService";
 import Modal from "@/components/Modal";
-import ConfirmationPopup from "@/components/ConfirmPopup";
 import ServiceCard from "@/components/ServiceCard";
 
 const EditShopService = ({ params } : { params: { sid: string }}) => {
-    const [deleteConfirmation, setDeleteConfirmation] = useState(false);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentEditedServiceId, setCurrentEditedServiceId] = useState("")
@@ -105,6 +103,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                 if(!prevServices) return prevServices;
                 return [...prevServices, response.data];
             })
+            console.log(services)
             setSuccess("Service added successfully.");
         } catch (err) {
             const errMessage = err instanceof Error ? err.message : "Unexpected error occurred";
@@ -113,7 +112,6 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
     }
 
     const handleDelete = async (serviceId: string) => {
-        console.log("TE")
         setError("");
         setSuccess("");
 

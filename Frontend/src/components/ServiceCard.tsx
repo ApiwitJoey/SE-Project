@@ -46,7 +46,7 @@ const ServiceCard = ({service, isEditable, deleteOnclick, editOnclick} : {servic
         {
             showPopup && isEditable && deleteOnclick && editOnclick && (
                 <ConfirmationPopup
-                    title={`Are you sure you want to delete ${service.name} service?`}
+                    title={`Are you sure you want to delete ${service.name} service from ${service.shop.name}?`}
                     message="this service will be gone forever, there is no redo."
                     onConfirm={() => {deleteOnclick(service._id); setShowPopup(false)}} 
                     onCancel={()=>setShowPopup(false)}/>

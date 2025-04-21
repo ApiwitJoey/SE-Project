@@ -34,7 +34,7 @@ export interface Shop {
 
 export interface Service {
     _id: string,
-    shop: string,
+    shop: Shop,
     name: string,
     price: number,
     details: string,
