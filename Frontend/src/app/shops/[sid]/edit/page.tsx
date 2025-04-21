@@ -31,7 +31,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
     const [services, setServices] = useState<Service[] | null>(null);
     const [loading, setLoading] = useState(true);
 
-    if(role != "admin"){
+    if(role != "admin" || !token){
         router.push('/');
     }
 
