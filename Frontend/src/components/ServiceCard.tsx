@@ -8,7 +8,7 @@ const ServiceCard = ({service, isEditable, deleteOnclick, editOnclick} : {servic
     return (
     <div
         key={service._id}
-        className="bg-emerald-50 rounded-lg p-5 border border-emerald-100 hover:shadow-md transition-shadow"
+        className="flex flex-col bg-emerald-50 rounded-lg p-5 border border-emerald-100 hover:shadow-md transition-shadow"
     >
         <h3 className="text-xl font-medium text-emerald-800 mb-2">
             {service.name}
@@ -17,7 +17,7 @@ const ServiceCard = ({service, isEditable, deleteOnclick, editOnclick} : {servic
             {service.details}
         </p>
         <p className="text-emerald-600 font-bold">
-            ฿{service.price}
+            ${service.price}
         </p>
         <p className="text-emerald-600 font-bold mb-3">
             {service.type}
