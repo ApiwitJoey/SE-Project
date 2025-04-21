@@ -82,7 +82,7 @@ const ReservationCart = () => {
                     className="bg-white rounded-xl shadow-sm p-6 border border-emerald-100 hover:shadow-md transition-shadow" 
                     key={connectedReservation._id}
                 >
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                         <div>
                             <p className="text-sm text-emerald-600">Date</p>
                             <p className="font-medium text-emerald-800">{connectedReservation.date}</p>
@@ -103,6 +103,27 @@ const ReservationCart = () => {
                                     : session?.user.name}
                             </p>
                         </div>
+
+                        {
+                             connectedReservation.service ? 
+                             <div>
+                                 <p className="text-sm text-emerald-600">
+                                     Service
+                                 </p>
+                                 <div className="flex flex-col">
+                                     <p className="font-medium text-emerald-800">
+                                         {connectedReservation.service.name}
+                                     </p>
+                                     <p className="font-medium text-emerald-800">
+                                         {connectedReservation.service.details}
+                                     </p>
+                                     <p className="font-medium text-emerald-800">
+                                         {connectedReservation.service.price}
+                                     </p>
+                                 </div>
+                             </div>
+                             : null
+                         }
                     </div>
 
                     <div className="flex justify-end space-x-4">

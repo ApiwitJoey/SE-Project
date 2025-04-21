@@ -35,6 +35,7 @@ const ShopSchema = new mongoose.Schema(
         "Please enter a valid time in HH:mm format",
       ],
     },
+    likes: [{type: mongoose.Schema.Types.ObjectId , ref: 'User'}],
   },
   {
     toJSON: { virtuals: true },

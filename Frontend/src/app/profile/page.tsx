@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import getMyProfile from "@/libs/Auth/GetMyProfile";
 import updateMyProfile from "@/libs/Auth/UpdateMyProfile";
+import ConfirmationPopup from "@/components/ConfirmPopup";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -226,26 +227,12 @@ export default function ProfilePage() {
         </div>
 
         {showConfirmBox && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white p-6 rounded shadow-xl space-y-4 w-[90%] max-w-md">
-              <h2 className="text-lg font-semibold text-gray-700">Confirmed</h2>
-              <p className="text-lg font-semibold text-gray-700">Are you sure you want to update your information?</p>
-              <div className="flex justify-end gap-3 pt-2">
-                <button
-                  onClick={() => setShowConfirmBox(false)}
-                  className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800"
-                >
-                  cancel
-                </button>
-                <button
-                  onClick={handleConfirmSave}
-                  className="px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white"
-                >
-                  confirm
-                </button>
-              </div>
-            </div>
-          </div>
+          <ConfirmationPopup
+            title="Confirmationed"
+            message="Are you sure you want to save the changes?"
+            onConfirm={handleConfirmSave}
+            onCancel={() => setShowConfirmBox(false)}
+          />
         )}
       </div>
     </div>

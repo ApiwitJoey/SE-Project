@@ -1,5 +1,6 @@
 const Reservation = require("../models/Reservation");
 const Shop = require("../models/Shop");
+const moment = require('moment'); 
 
 // @desc Get one reservation
 // @route GET /api/v1/reservations/:id
@@ -43,14 +44,22 @@ exports.getReservations = async (req, res, next) => {
       query = Reservation.find({
         user: req.user.id,
         shop: req.params.shopId,
+      })
+      .populate({
+        path: "shop",
+        select: "name province tel",
       }).populate({
-        path: "shop",
-        select: "name province tel",
-      });
+        path: "service",
+        select: "name price details -_id"
+      });;
     } else {
-      query = Reservation.find({ user: req.user.id }).populate({
+      query = Reservation.find({ user: req.user.id })
+      .populate({
         path: "shop",
         select: "name province tel",
+      }).populate({
+        path: "service",
+        select: "name price details -_id"
       });
     }
   } else {
@@ -60,12 +69,21 @@ exports.getReservations = async (req, res, next) => {
       query = Reservation.find({ shop: req.params.shopId }).populate({
         path: "shop",
         select: "name address telephone openTime closeTime",
-      });
+      })
+      .populate({
+        path: "service",
+        select: "name price details -_id"
+      });;
     } else {
-      query = Reservation.find().populate({
+      query = Reservation.find()
+      .populate({
         path: "shop",
         select: "name address telephone openTime closeTime",
-      });
+      })
+      .populate({
+        path: "service",
+        select: "name price details -_id"
+      });;
     }
   }
 
@@ -99,6 +117,9 @@ exports.createReservation = async (req, res, next) => {
         message: `No shop with the id of ${req.params.shopId}`,
       });
     }
+
+    req.body.date = moment.utc(req.body.date).toDate();
+
     console.log(req.body);
 
     // add user Id to req.body
@@ -138,6 +159,8 @@ exports.updateReservation = async (req, res, next) => {
         message: `No reservation with the id of ${req.params.id}`,
       });
     }
+
+    req.body.date = moment.utc(req.body.date).toDate();
 
     // Make sure user is the reservation owner
     if (

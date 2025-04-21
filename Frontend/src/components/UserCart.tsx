@@ -14,6 +14,7 @@ import { banUser as banUserRedux } from "@/redux/features/userSlice";
 import { unbanUser as unbanUserRedux } from "@/redux/features/userSlice";
 import { removeUser } from "@/redux/features/userSlice";
 import CircularProgress from '@mui/material/CircularProgress';
+import ConfirmationPopup from "./ConfirmPopup";
 
 const UserCart = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -25,6 +26,12 @@ const UserCart = () => {
     const role = session?.user.role;
 
     const [loading, setLoading] = useState(true)
+    const [showPopup, setShowPopup] = useState(false);
+    const [currentUser, setUser] = useState({
+        name: "",
+        id: "",
+    });
+    
     
     if(role != 'admin'){
         router.push('/api/auth/signin')
@@ -53,6 +60,7 @@ const UserCart = () => {
             const response = await deleteUser(id,token);
             if(response.success){
                 dispatch(removeUser(id));
+                setShowPopup(false);
             }
         }
     }
@@ -126,7 +134,7 @@ const UserCart = () => {
                             </div>
                             <div className="flex justify-end space-x-3 mt-4">
                                 <button 
-                                    onClick={() => handleDelete(user._id)}
+                                    onClick={() => {setUser({name:user.name, id:user._id}); setShowPopup(true);}}
                                     className="px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors"
                                 >
                                     Delete
@@ -170,7 +178,7 @@ const UserCart = () => {
                                 </div>
                                 <div className="flex justify-end space-x-3 mt-4">
                                     <button 
-                                        onClick={() => handleDelete(user._id)}
+                                        onClick={() => {setUser({name:user.name, id:user._id}); setShowPopup(true);}}
                                         className="px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors"
                                     >
                                         Delete
@@ -186,6 +194,14 @@ const UserCart = () => {
                         ))}
                     </div>
                 </div>
+            )}
+
+            {showPopup && (
+                <ConfirmationPopup
+                title={`Are you sure you want to delete ${currentUser.name} account?`}
+                message="this account will be gone forever, there is no redo."
+                onConfirm={()=>handleDelete(currentUser.id)} 
+                onCancel={()=>setShowPopup(false)}/>
             )}
         </div>
     )

@@ -18,14 +18,20 @@ const BookingPage = () => {
   const defaultShopId = searchParams.get("shopId") || null;
   const dispatch = useDispatch<AppDispatch>();
 
-  const handleSubmit = async (date:string, selectedShopId:string) => {
+  const handleSubmit = async (date:string, selectedShopId:string, selectedServiceId: string) => {
     if (dayjs(date).isBefore(dayjs(), 'day')) {
       setError("Cannot select a past date.");
       return;
     }
 
+    if(!selectedServiceId) {
+      setError("You need to select a service");
+      return;
+    }
+
     const body = {
-      date: dayjs(date).format("YYYY/MM/DD")
+      date: dayjs(date).format("YYYY-MM-DDTHH:mm:ss"),
+      service: selectedServiceId
     }
     
     if(selectedShopId){

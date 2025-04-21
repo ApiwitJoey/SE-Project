@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require('crypto');
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -44,16 +45,28 @@ const UserSchema = new mongoose.Schema({
     required: [true, "Please specify if the user is banned"],
     default: false, // Default to false, meaning not banned
   },
+    likedShops: [{type: mongoose.Schema.Types.ObjectId, ref: 'Shop'}]
 });
 
-// UserSchema.virtual("reservations", {
-//   ref: "Reservation",
-//   localField: "_id",
-//   foreignField: "user_id",
-//   justOne: false,
-// });
+// Generate reset token
+UserSchema.methods.getResetPasswordToken = function() {
+  // Generate 6 digits OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  // Hash OTP and set to resetPasswordToken field
+  this.resetPasswordToken = crypto.createHash('sha256').update(otp).digest('hex');
+
+  // Set expire
+  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+  return otp;
+}
 
 UserSchema.pre("save", async function (next) {
+  if (!this.isModified('password')) {
+    next();
+  }
+
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });

@@ -4,6 +4,7 @@ export interface ReservationItem {
     shop: Shop,
     date: string,
     createdAt: string,
+    service: Service,
     __v: string,
 }
 
@@ -31,6 +32,21 @@ export interface Shop {
     reservations: ReservationItem[]
 }
 
+export interface Service {
+    _id: string,
+    shop: Shop,
+    name: string,
+    price: number,
+    details: string,
+    type: string
+}
+
+export interface ServiceJson {
+    success: boolean,
+    count: number,
+    data: Service[]
+}
+
 export interface ShopJson {
     success: boolean,
     count: number,
@@ -38,22 +54,40 @@ export interface ShopJson {
 }
 
 export interface UpdateReservationDto {
-    shop: string;
-    date: string;
+    shop: string,
+    date: string,
+    service: string
 }
 
 export interface CreateReservatinDto {
-    date: string
+    date: string,
+    service: string
 }
 
 export interface ConnectedReservation {
-    userName: string;
-    _id: string;
-    user: string;
-    shop: Shop;
-    date: string;
-    createdAt: string;
-    __v: string;
+    userName: string,
+    _id: string,
+    user: string,
+    shop: Shop,
+    date: string,
+    createdAt: string,
+    service: Service,
+    __v: string
 }
 
-// test commit 2
+export interface CreateServiceDto { 
+    shop: string,
+    name: string,
+    price: number,
+    details: string,
+    type: string
+}
+
+export interface UpdateServiceDto {
+    shop?: string,
+    name?: string,
+    price?: number,
+    details?: string,
+    type?: string
+}
+
