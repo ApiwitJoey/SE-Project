@@ -65,6 +65,11 @@ export default function ResetPasswordPage() {
         setLoading(false);
         return;
       }
+      if (newPassword.length < 6) {
+        setError("Password must be at least 6 characters long");
+        setLoading(false);
+        return;
+      }
       try {
         const response = await resetPassword(otp,newPassword);
 
@@ -168,7 +173,7 @@ export default function ResetPasswordPage() {
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-4 top-[44px] text-gray-500"
+                    className="absolute right-4 top-1/2 translate-y-[10%] text-gray-500"
                   >
                     {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -184,7 +189,7 @@ export default function ResetPasswordPage() {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-[44px] text-gray-500"
+                    className="absolute right-4 top-1/2 translate-y-[10%] text-gray-500"
                   >
                     {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>

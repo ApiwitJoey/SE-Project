@@ -73,12 +73,12 @@ export default function SignInPage() {
                 onInputChange={(value: string) => setPassword(value)}
                 labelText="Password"
                 type={showPassword ? "text" : "password"}
-                inputClass="text-lg p-4 border border-gray-300 rounded-md w-full pr-12"
+                inputClass="relative text-lg p-4 border border-gray-300 rounded-md w-full pr-12"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-[44px] text-gray-500"
+                className="absolute right-4 top-1/2 translate-y-[10%] text-gray-500"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>

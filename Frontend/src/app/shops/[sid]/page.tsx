@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Service, ServiceJson, Shop, ShopJson } from "../../../../interfaces";
 import { useRouter } from "next/navigation";
 import CircularProgress from "@mui/material/CircularProgress";
+import ServiceCard from "@/components/ServiceCard";
 
 export default function ShopDetailPage({
     params,
@@ -173,20 +174,7 @@ export default function ShopDetailPage({
                     {services?.length ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {services.map((service) => (
-                                <div
-                                    key={service._id}
-                                    className="bg-emerald-50 rounded-lg p-5 border border-emerald-100 hover:shadow-md transition-shadow"
-                                >
-                                    <h3 className="text-xl font-medium text-emerald-800 mb-2">
-                                        {service.name}
-                                    </h3>
-                                    <p className="text-emerald-700 mb-3">
-                                        {service.details}
-                                    </p>
-                                    <p className="text-emerald-600 font-bold">
-                                        ฿{service.price}
-                                    </p>
-                                </div>
+                                <ServiceCard service={service} isEditable={false}/>
                             ))}
                         </div>
                     ) : (

@@ -4,6 +4,7 @@ import { useAppSelector, AppDispatch } from "@/redux/store";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import getAllShops from "@/libs/Shops/getAllShops";
 import { Shop, ShopJson } from "../../interfaces";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -15,14 +16,32 @@ export default function ShopList() {
     const dispatch = useDispatch<AppDispatch>();
     const { data: session } = useSession();
     const [loading, setLoading] = useState(true);
+    const searchParams = useSearchParams();
 
     const token = session?.user.token;
 
+    // Get filter params from URL
+    const nameFilter = searchParams.get('name') || '';
+    const timeFilter = searchParams.get('time') || '';
+    const openTimeFilter = searchParams.get('openTime') || '';
+    const closeTimeFilter = searchParams.get('closeTime') || '';
+
     useEffect(() => {
         const fetchShop = async () => {
-            const response: ShopJson = await getAllShops();
+            // Build query params for API call
+            let queryParams = new URLSearchParams();
+            if (nameFilter) queryParams.append('name', nameFilter);
+            if (timeFilter) queryParams.append('time', timeFilter);
+            if (openTimeFilter) queryParams.append('openTime', openTimeFilter);
+            if (closeTimeFilter) queryParams.append('closeTime', closeTimeFilter);
+            
+            const queryString = queryParams.toString();
+            const response: ShopJson = await getAllShops(queryString);
+            
             if (response.success) {
                 setShops(response.data);
+                // Clear existing shops in the store before adding new ones
+                dispatch({ type: 'shop/clearShops' });
                 response.data.forEach((shop: Shop) => {
                     dispatch(addShop(shop));
                 });
@@ -30,7 +49,7 @@ export default function ShopList() {
             }
         };
         fetchShop();
-    }, [dispatch]);
+    }, [dispatch, nameFilter, timeFilter, openTimeFilter, closeTimeFilter]);
 
     if (loading) {
         return (
@@ -53,7 +72,7 @@ export default function ShopList() {
                     {shopItems.map((shopItem) => (
                         <div
                             className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-emerald-100"
-                            key={shopItem.name}
+                            key={shopItem._id}
                         >
                             <div className="p-6">
                                 <div className="text-xl font-bold text-emerald-800 mb-2">

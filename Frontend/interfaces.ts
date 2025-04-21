@@ -34,10 +34,11 @@ export interface Shop {
 
 export interface Service {
     _id: string,
-    shop: string,
+    shop: Shop,
     name: string,
     price: number,
-    details: string
+    details: string,
+    type: string
 }
 
 export interface ServiceJson {
@@ -65,19 +66,28 @@ export interface CreateReservatinDto {
 
 export interface ConnectedReservation {
     userName: string,
-     _id: string,
-     user: string,
-     shop: Shop,
-     date: string,
-     createdAt: string,
-     service: Service,
-     __v: string
+    _id: string,
+    user: string,
+    shop: Shop,
+    date: string,
+    createdAt: string,
+    service: Service,
+    __v: string
 }
 
 export interface CreateServiceDto { 
     shop: string,
     name: string,
     price: number,
-    details: string
+    details: string,
+    type: string
+}
+
+export interface UpdateServiceDto {
+    shop?: string,
+    name?: string,
+    price?: number,
+    details?: string,
+    type?: string
 }
 

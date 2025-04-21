@@ -83,7 +83,8 @@ exports.createService = async (req, res, next) => {
             })
         }
         const service = await Service.create(req.body);
-        res.status(201).json({ success: true, data: service });
+        const populatedService = await service.populate('shop');
+        res.status(201).json({ success: true, data: populatedService });
     } catch (err) {
         console.log(err.stack);
         return res
