@@ -11,6 +11,7 @@ import { removeUser } from "@/redux/features/userSlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import userLogout from "@/libs/Auth/userLogout";
 import ConfirmationPopup from "@/components/ConfirmPopup";
+import { signOut } from "next-auth/react";
 
 export default function ProfilePage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -31,6 +32,12 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
 
   const [showPopup, setShowPopup] = useState(false);
+  const [popupProps, setPopupProps] = useState({
+    title: "",
+    message: "",
+    onConfirm: () => {},
+    onCancel: () => {},
+  });
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -80,12 +87,40 @@ export default function ProfilePage() {
     setIsEditing(false);
   };
 
+  const handleShowSignOutPopup = () => {
+    setPopupProps({
+      title: "Are you sure you want to sign out?",
+      message: "You will be logged out and redirected to the homepage.",
+      onConfirm: async () => {
+        await logout();
+        setShowPopup(false);
+      },
+      onCancel: () => setShowPopup(false),
+    });
+    setShowPopup(true);
+  };
+
+  const handleShowDeleteAccountPopup = () => {
+    setPopupProps({
+      title: "Are you sure you want to delete your account?",
+      message: "Your account will be gone forever, there is no redo.",
+      onConfirm: async () => {
+        await deleteAcc(user._id);
+        setShowPopup(false);
+      },
+      onCancel: () => setShowPopup(false),
+    });
+    setShowPopup(true);
+  };
+
   const logout = async () => {
     if (token) {
       const response = await userLogout();
       if (response.success) {
         console.log("User logged out");
+        await signOut({ redirect : false });
         router.push("/");
+        router.refresh();
       }
     }
   };
@@ -209,18 +244,14 @@ export default function ProfilePage() {
           {/* Delete Account */}
           <button
             className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded shadow-sm"
-            onClick={() => {
-              setShowPopup(true);
-            }}
+            onClick={handleShowDeleteAccountPopup}
           >
             Delete Account
           </button>
           {/* Sign out */}
           <button
-            onClick={() => {
-              logout();
-            }}
             className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded shadow-sm"
+            onClick={handleShowSignOutPopup}
           >
             Sign Out
           </button>
@@ -228,10 +259,11 @@ export default function ProfilePage() {
         
         {showPopup && (
           <ConfirmationPopup
-          title="Are you sure you want to delete your account?"
-          message="your account will be gone forever, there is no redo."
-          onConfirm={()=>deleteAcc(user._id)} 
-          onCancel={()=>setShowPopup(false)}/>
+            title={popupProps.title}
+            message={popupProps.message}
+            onConfirm={popupProps.onConfirm}
+            onCancel={popupProps.onCancel}
+          />
         )}
       </div>
     </div>
