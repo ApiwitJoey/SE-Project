@@ -186,6 +186,9 @@ export default function ShopDetailPage({
                                     <p className="text-emerald-600 font-bold">
                                         ฿{service.price}
                                     </p>
+                                    <p className="text-emerald-600 font-bold mb-3">
+                                        {service.type}
+                                    </p>
                                 </div>
                             ))}
                         </div>

@@ -11,8 +11,11 @@ import createService from "@/libs/Service/createService";
 import deleteService from "@/libs/Service/deleteService";
 import updateService from "@/libs/Service/updateService";
 import Modal from "@/components/Modal";
+import ConfirmationPopup from "@/components/ConfirmPopup";
 
 const EditShopService = ({ params } : { params: { sid: string }}) => {
+    const [deleteConfirmation, setDeleteConfirmation] = useState(false);
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentEditedServiceId, setCurrentEditedServiceId] = useState("")
     const [editedError, seteditedError] = useState("");
@@ -53,7 +56,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
         fetchShop();
     }, []);
 
-    const addNewService = async ( serviceName:string, price:string, detail:string ) => {
+    const addNewService = async ( serviceName:string, price:string, detail:string, type:string ) => {
         setError("");
         setSuccess("");
         const parsedPrice = parseFloat(price);
@@ -73,6 +76,11 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
             return;
         }
 
+        if(!type){
+            setError("Please enter the service type.");
+            return;
+        }
+
         if(!shopDetail?._id){
             setError("Shop ID not found. Cannot add a new service.");
             return;
@@ -87,7 +95,8 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
             shop: shopDetail._id,
             name: serviceName,
             price: parsedPrice,
-            details: detail
+            details: detail,
+            type: type
         }
         try {
             const response = await createService(shopDetail?._id, token, body);
@@ -238,6 +247,9 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                                 <p className="text-emerald-600 font-bold mb-3">
                                     ฿{service.price}
                                 </p>
+                                <p className="text-emerald-600 font-bold mb-3">
+                                    {service.type}
+                                </p>
 
                                 <div className="mt-auto ml-auto flex flex-row gap-2">
                                     <button onClick={(e) => {setIsModalOpen(true); setCurrentEditedServiceId(service._id); seteditedError("");}} className="px-5 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors flex items-center">
@@ -254,7 +266,6 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                                         Delete
                                     </button>
                                 </div>
-
                             </div>
                         ))}
                     </div>

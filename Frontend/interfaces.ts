@@ -37,7 +37,8 @@ export interface Service {
     shop: string,
     name: string,
     price: number,
-    details: string
+    details: string,
+    type: string
 }
 
 export interface ServiceJson {
@@ -78,13 +79,15 @@ export interface CreateServiceDto {
     shop: string,
     name: string,
     price: number,
-    details: string
+    details: string,
+    type: string
 }
 
 export interface UpdateServiceDto {
     shop?: string,
     name?: string,
     price?: number,
-    details?: string
+    details?: string,
+    type?: string
 }
 
