@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -11,7 +11,6 @@ export default function ProfilePage() {
   const { data: session } = useSession();
   const token = session?.user?.token;
 
-
   const [user, setUser] = useState({
     name: "",
     email: "",
@@ -19,22 +18,31 @@ export default function ProfilePage() {
     role: "",
   });
 
-  const [formData, setFormData] = useState({ ...user });
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    telephone: "",
+    role: "",
+  });
 
   const [isEditing, setIsEditing] = useState(false);
+  const [showConfirmBox, setShowConfirmBox] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!token) {
-        console.log("No token available");
-        return;
-      }
-
+      if (!token) return;
       try {
         const data = await getMyProfile(token);
-        console.log("User data:", data);
+        const [firstName = "", lastName = ""] = data.data.name.split(" ");
         setUser(data.data);
-        setFormData(data.data);
+        setFormData({
+          firstName,
+          lastName,
+          email: data.data.email,
+          telephone: data.data.telephone || "",
+          role: data.data.role,
+        });
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -47,81 +55,116 @@ export default function ProfilePage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSave = async () => {
-    if (!token) {
-      console.error("No token available.");
+  const validatePhone = (phone: string) => /^0\d{8,9}$/.test(phone);
+
+  const handleSave = () => {
+    if (!validatePhone(formData.telephone)) {
+      alert("กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (เริ่มด้วย 0 และมี 9-10 หลัก)");
       return;
     }
+    setShowConfirmBox(true);
+  };
+
+  const handleConfirmSave = async () => {
+    if (!token) return;
 
     try {
-      const updatedUser = await updateMyProfile(token, formData); 
+      const updatedUser = await updateMyProfile(token, {
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        telephone: formData.telephone,
+        role: formData.role,
+      });
+
       if (updatedUser.success) {
-        setUser(updatedUser.data); 
-        setIsEditing(false); 
+        setUser(updatedUser.data);
+        setIsEditing(false);
       } else {
         console.error("Error updating user data:", updatedUser.message);
       }
     } catch (error) {
       console.error("Error saving user data:", error);
+    } finally {
+      setShowConfirmBox(false);
     }
   };
 
   const handleCancel = () => {
-    setFormData({ ...user });
+    const [firstName = "", lastName = ""] = user.name.split(" ");
+    setFormData({
+      firstName,
+      lastName,
+      email: user.email,
+      telephone: user.telephone || "",
+      role: user.role,
+    });
     setIsEditing(false);
   };
 
   const logout = () => {
-    console.log("User logged out");
-    router.push("/api/auth/signin"); 
+    router.push("/api/auth/signin");
   };
 
   return (
     <div className="min-h-screen pt-[80px] px-4 pb-16 bg-gradient-to-b from-white to-green-100 flex justify-center">
       <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-8 space-y-6">
-        {/* Profile Section */}
         <div className="flex items-center gap-4 border-b border-gray-200 pb-4">
           <AccountCircleIcon className="text-green-700" style={{ fontSize: 50 }} />
           <div>
-            <h2 className="text-3xl font-semibold text-green-900">{formData.name}</h2>
+            <h2 className="text-3xl font-semibold text-green-900">
+              {formData.firstName} {formData.lastName}
+            </h2>
             <p className="text-sm text-gray-500">User Profile Overview</p>
           </div>
         </div>
 
         <div className="grid gap-4 text-sm md:text-base text-gray-700">
-          {/* Full Name */}
-          <div className="flex flex-col">
-            <label className="font-medium text-gray-600">Full Name</label>
-            {isEditing ? (
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="border rounded px-3 py-2 mt-1"
-              />
-            ) : (
-              <span className="mt-1">{formData.name}</span>
-            )}
+          {/* First + Last Name */}
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col w-full">
+              <label className="font-medium text-gray-600">First Name</label>
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  className="border rounded px-3 py-2 mt-1"
+                />
+              ) : (
+                <span className="mt-1">{formData.firstName}</span>
+              )}
+            </div>
+
+            <div className="flex flex-col w-full">
+              <label className="font-medium text-gray-600">Last Name</label>
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className="border rounded px-3 py-2 mt-1"
+                />
+              ) : (
+                <span className="mt-1">{formData.lastName}</span>
+              )}
+            </div>
           </div>
 
-          {/* Email Address */}
+          {/* Email */}
           <div className="flex flex-col">
             <label className="font-medium text-gray-600">Email Address</label>
-            {isEditing ? (
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="border rounded px-3 py-2 mt-1"
-              />
-            ) : (
-              <span className="mt-1">{formData.email}</span>
-            )}
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              disabled
+              className="border bg-gray-100 cursor-not-allowed rounded px-3 py-2 mt-1"
+            />
           </div>
 
-          {/* Phone Number */}
+          {/* Phone */}
           <div className="flex flex-col">
             <label className="font-medium text-gray-600">Phone Number</label>
             {isEditing ? (
@@ -137,14 +180,14 @@ export default function ProfilePage() {
             )}
           </div>
 
-          {/* User Role */}
+          {/* Role */}
           <div className="flex flex-col">
             <label className="font-medium text-gray-600">User Role</label>
             <span
               className={`w-fit self-start mt-1 px-3 py-1 text-sm font-medium text-white rounded 
               ${formData.role ? (formData.role === "admin" ? "bg-green-800" : "bg-green-500") : "bg-gray-400"}`}
             >
-              {formData.role ? (formData.role.charAt(0).toUpperCase() + formData.role.slice(1)) : "Unknown Role"}
+              {formData.role ? formData.role.charAt(0).toUpperCase() + formData.role.slice(1) : "Unknown Role"}
             </span>
           </div>
         </div>
@@ -175,15 +218,35 @@ export default function ProfilePage() {
           )}
 
           <button
-            onClick={() => {
-              logout();
-              router.push("/api/auth/signin");
-            }}
+            onClick={logout}
             className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded shadow-sm"
           >
             Sign Out
           </button>
         </div>
+
+        {showConfirmBox && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white p-6 rounded shadow-xl space-y-4 w-[90%] max-w-md">
+              <h2 className="text-lg font-semibold text-gray-700">Confirmed</h2>
+              <p className="text-lg font-semibold text-gray-700">Are you sure you want to update your information?</p>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  onClick={() => setShowConfirmBox(false)}
+                  className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800"
+                >
+                  cancel
+                </button>
+                <button
+                  onClick={handleConfirmSave}
+                  className="px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white"
+                >
+                  confirm
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
