@@ -228,7 +228,7 @@ const sendEmail = async (option) => {
     
    
     <div style="text-align: center; margin-bottom: 30px;">
-      <img src="https://i.postimg.cc/wBJtkWWk/Rosa-Maria.jpg" alt="SABAAI Logo" style="max-width: 200px; border-radius: 10px;" />
+      <img src="https://i.postimg.cc/4xrSTJhz/temp-Image-BMx-Ka-M.avif" alt="SABAAI Logo" style="max-width: 200px; border-radius: 10px;" />
     </div>
     
     <h2 style="text-align: center; font-size: 24px; color: #065f46; margin-bottom: 20px;">Hi ${option.toUser},</h2>
