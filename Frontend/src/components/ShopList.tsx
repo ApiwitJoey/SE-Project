@@ -2,7 +2,7 @@
 import { addShop } from "@/redux/features/shopSlice";
 import { useAppSelector, AppDispatch } from "@/redux/store";
 import { useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import getAllShops from "@/libs/Shops/getAllShops";
@@ -11,14 +11,11 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Link from "next/link";
 
 export default function ShopList() {
-    const [shops, setShops] = useState<Shop[] | null>(null);
-    const shopItems = useAppSelector((state) => state.shop.shop);
+    const [allShops, setAllShops] = useState<Shop[] | null>(null);
     const dispatch = useDispatch<AppDispatch>();
     const { data: session } = useSession();
     const [loading, setLoading] = useState(true);
     const searchParams = useSearchParams();
-
-    const token = session?.user.token;
 
     // Get filter params from URL
     const nameFilter = searchParams.get('name') || '';
@@ -26,30 +23,67 @@ export default function ShopList() {
     const openTimeFilter = searchParams.get('openTime') || '';
     const closeTimeFilter = searchParams.get('closeTime') || '';
 
+    // Fetch shops only once when component mounts
     useEffect(() => {
         const fetchShop = async () => {
-            // Build query params for API call
-            let queryParams = new URLSearchParams();
-            if (nameFilter) queryParams.append('name', nameFilter);
-            if (timeFilter) queryParams.append('time', timeFilter);
-            if (openTimeFilter) queryParams.append('openTime', openTimeFilter);
-            if (closeTimeFilter) queryParams.append('closeTime', closeTimeFilter);
-            
-            const queryString = queryParams.toString();
-            const response: ShopJson = await getAllShops(queryString);
+            const response: ShopJson = await getAllShops();
             
             if (response.success) {
-                setShops(response.data);
-                // Clear existing shops in the store before adding new ones
-                dispatch({ type: 'shop/clearShops' });
-                response.data.forEach((shop: Shop) => {
-                    dispatch(addShop(shop));
-                });
+                setAllShops(response.data);
                 setLoading(false);
             }
         };
         fetchShop();
-    }, [dispatch, nameFilter, timeFilter, openTimeFilter, closeTimeFilter]);
+    }, []);
+
+    // Apply filters locally using useMemo
+    const filteredShops = useMemo(() => {
+        if (!allShops) return [];
+
+        return allShops.filter(shop => {
+            // Filter by name
+            if (nameFilter && !shop.name.toLowerCase().includes(nameFilter.toLowerCase())) {
+                return false;
+            }
+
+            // Filter by time (check if the time is within opening hours)
+            if (timeFilter) {
+                const time = timeFilter.trim();
+                const shopOpenTime = shop.openTime;
+                const shopCloseTime = shop.closeTime;
+                
+                // Simple time comparison (assumes 24-hour format like "08:00")
+                if (time < shopOpenTime || time > shopCloseTime) {
+                    return false;
+                }
+            }
+
+            // Add additional filters for openTime and closeTime if needed
+            if (openTimeFilter && shop.openTime < openTimeFilter) {
+                return false;
+            }
+
+            if (closeTimeFilter && shop.closeTime > closeTimeFilter) {
+                return false;
+            }
+
+            return true;
+        });
+    }, [allShops, nameFilter, timeFilter, openTimeFilter, closeTimeFilter]);
+
+    // Update Redux store whenever filtered shops change
+    useEffect(() => {
+        if (filteredShops.length > 0) {
+            // Clear existing shops in the store before adding new ones
+            dispatch({ type: 'shop/clearShops' });
+            filteredShops.forEach((shop: Shop) => {
+                dispatch(addShop(shop));
+            });
+        }
+    }, [filteredShops, dispatch]);
+
+    // Use shopItems from Redux for rendering
+    const shopItems = useAppSelector((state) => state.shop.shop);
 
     if (loading) {
         return (

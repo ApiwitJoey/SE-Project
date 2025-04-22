@@ -20,9 +20,11 @@ export const shopSlice = createSlice({
                 })
             state.shop = remainUser;
         },
-        
+        clearShops: (state) => {
+            state.shop = [];
+        }
     }
 });
 
-export const { addShop, removeShop } = shopSlice.actions
+export const { addShop, removeShop, clearShops } = shopSlice.actions
 export default shopSlice.reducer
