@@ -12,8 +12,10 @@ import deleteService from "@/libs/Service/deleteService";
 import updateService from "@/libs/Service/updateService";
 import Modal from "@/components/Modal";
 import ServiceCard from "@/components/ServiceCard";
+import { PrevInfo } from "@/components/EditShopServiceForm";
 
 const EditShopService = ({ params } : { params: { sid: string }}) => {
+    const [prevInfo, setPrevInfo] = useState<PrevInfo | undefined>(undefined);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentEditedServiceId, setCurrentEditedServiceId] = useState("")
@@ -132,9 +134,9 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
         }
     }
 
-    const handleEdit = async ( serviceName:string, price:string, detail:string ) => {
-        if(!serviceName && !price && !detail){
-            seteditedError("Please enter some informatin.");
+    const handleEdit = async ( serviceName:string, price:string, detail:string, type:string ) => {
+        if(!serviceName && !price && !detail && !type){
+            seteditedError("Please enter some information.");
             return;
         }
 
@@ -147,6 +149,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
             name: serviceName || undefined,
             price: price ? parseFloat(price) : undefined,
             details: detail || undefined,
+            type: type || undefined
           };
 
         try {
@@ -205,7 +208,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                         <p className="font-medium">{editedError}</p>
                     </div>
                 )}
-                <EditShopServiceForm onSubmit={handleEdit} header="Edit Sevice" />
+                <EditShopServiceForm onSubmit={handleEdit} header="Edit Sevice" prevInfo={prevInfo} />
             </Modal>
 
             <div className="max-w-md mx-auto"> 
@@ -237,7 +240,12 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                             <ServiceCard 
                                 service={service} 
                                 isEditable={true} 
-                                editOnclick={() => {setIsModalOpen(true); setCurrentEditedServiceId(service._id); seteditedError("");}}
+                                editOnclick={() => {setCurrentEditedServiceId(service._id); seteditedError(""); setPrevInfo({
+                                    serviceName: service.name,
+                                    price: service.price.toString(),
+                                    detail: service.details,
+                                    type: service.type
+                                }); setIsModalOpen(true);}}
                                 deleteOnclick={handleDelete}
                             />
                         ))}
