@@ -1,5 +1,5 @@
 "use client";
-import { addShop } from "@/redux/features/shopSlice";
+import { addShop, clearShops } from "@/redux/features/shopSlice"; // Import clearShops
 import { useAppSelector, AppDispatch } from "@/redux/store";
 import { useDispatch } from "react-redux";
 import { useEffect, useState, useMemo } from "react";
@@ -73,9 +73,11 @@ export default function ShopList() {
 
     // Update Redux store whenever filtered shops change
     useEffect(() => {
+        // Always clear the store first
+        dispatch(clearShops());
+        
+        // Then add the filtered shops
         if (filteredShops.length > 0) {
-            // Clear existing shops in the store before adding new ones
-            dispatch({ type: 'shop/clearShops' });
             filteredShops.forEach((shop: Shop) => {
                 dispatch(addShop(shop));
             });

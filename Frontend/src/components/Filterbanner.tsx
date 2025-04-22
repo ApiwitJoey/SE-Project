@@ -10,13 +10,6 @@ export default function FilterBanner() {
     const [nameFilter, setNameFilter] = useState(searchParams.get('name') || '');
     const [timeFilter, setTimeFilter] = useState(searchParams.get('time') || '');
     
-    // Options for time selection
-    const timeOptions = [
-        "08:00", "09:00", "10:00", "11:00", "12:00", 
-        "13:00", "14:00", "15:00", "16:00", "17:00", 
-        "18:00", "19:00", "20:00", "21:00"
-    ];
-    
     const handleFilter = (e: React.FormEvent) => {
         e.preventDefault();
         
@@ -51,7 +44,7 @@ export default function FilterBanner() {
                             value={nameFilter}
                             onChange={(e) => setNameFilter(e.target.value)}
                             placeholder="Search by name"
-                            className="w-full px-3 py-2 border border-emerald-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                            className="w-full px-3 py-2 border border-emerald-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-black"
                         />
                     </div>
                     
@@ -66,7 +59,7 @@ export default function FilterBanner() {
                             value={timeFilter}
                             onChange={(e) => setTimeFilter(e.target.value)}
                             placeholder="Search by Time"
-                            className="w-full px-3 py-2 border border-emerald-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                            className="w-full px-3 py-2 border border-emerald-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-black"
                         >
                         </input>
                     </div>
