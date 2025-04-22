@@ -6,6 +6,9 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import getMyProfile from "@/libs/Auth/GetMyProfile";
 import updateMyProfile from "@/libs/Auth/UpdateMyProfile";
 import ConfirmationPopup from "@/components/ConfirmPopup";
+import SuccessPopup from "@/components/SuccessPopup";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -29,6 +32,8 @@ export default function ProfilePage() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [showConfirmBox, setShowConfirmBox] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false); 
+  const [showSnackbar, setShowSnackbar] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -60,11 +65,12 @@ export default function ProfilePage() {
 
   const handleSave = () => {
     if (!validatePhone(formData.telephone)) {
-      alert("กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (เริ่มด้วย 0 และมี 9-10 หลัก)");
+      setShowSnackbar(true);
       return;
     }
     setShowConfirmBox(true);
   };
+  
 
   const handleConfirmSave = async () => {
     if (!token) return;
@@ -80,6 +86,7 @@ export default function ProfilePage() {
       if (updatedUser.success) {
         setUser(updatedUser.data);
         setIsEditing(false);
+        setShowSuccessPopup(true);
       } else {
         console.error("Error updating user data:", updatedUser.message);
       }
@@ -234,6 +241,26 @@ export default function ProfilePage() {
             onCancel={() => setShowConfirmBox(false)}
           />
         )}
+        {showSuccessPopup && (
+          <SuccessPopup
+            message="Profile updated successfully!"
+            onClose={() => setShowSuccessPopup(false)} // Close the success popup
+          />
+        )}
+
+        {/* Snackbar for phone validation */}
+        {/* Snackbar for phone validation */}
+        <Snackbar
+          open={showSnackbar}
+          autoHideDuration={6000}
+          onClose={() => setShowSnackbar(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }} 
+        >
+          <Alert onClose={() => setShowSnackbar(false)} severity="error">
+            กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (เริ่มด้วย 0 และมี 9-10 หลัก)
+          </Alert>
+        </Snackbar>
+
       </div>
     </div>
   );
