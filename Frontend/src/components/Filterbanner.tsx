@@ -9,8 +9,6 @@ export default function FilterBanner() {
     // Get current filter values from URL or set defaults
     const [nameFilter, setNameFilter] = useState(searchParams.get('name') || '');
     const [timeFilter, setTimeFilter] = useState(searchParams.get('time') || '');
-    const [openTimeFilter, setOpenTimeFilter] = useState(searchParams.get('openTime') || '');
-    const [closeTimeFilter, setCloseTimeFilter] = useState(searchParams.get('closeTime') || '');
     
     // Options for time selection
     const timeOptions = [
@@ -27,8 +25,6 @@ export default function FilterBanner() {
         
         if (nameFilter) params.append('name', nameFilter);
         if (timeFilter) params.append('time', timeFilter);
-        if (openTimeFilter) params.append('openTime', openTimeFilter);
-        if (closeTimeFilter) params.append('closeTime', closeTimeFilter);
         
         // Redirect to the same page with filters
         router.push(`/shops?${params.toString()}`);
@@ -37,16 +33,14 @@ export default function FilterBanner() {
     const clearFilters = () => {
         setNameFilter('');
         setTimeFilter('');
-        setOpenTimeFilter('');
-        setCloseTimeFilter('');
         router.push('/shops');
     };
     
     return (
-        <div className="bg-emerald-50 rounded-xl p-5 mb-8 border border-emerald-100 shadow-sm">
+        <div className="bg-emerald-200 rounded-xl p-5 mb-8 border border-emerald-100 shadow-sm">
             <form onSubmit={handleFilter}>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {/* Shop Name Filter */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/*Shop Name Filter*/}
                     <div>
                         <label htmlFor="name-filter" className="block text-sm font-medium text-emerald-700 mb-1">
                             Shop Name
@@ -66,59 +60,15 @@ export default function FilterBanner() {
                         <label htmlFor="time-filter" className="block text-sm font-medium text-emerald-700 mb-1">
                             Available At
                         </label>
-                        <select
+                        <input 
                             id="time-filter"
+                            type="text"
                             value={timeFilter}
                             onChange={(e) => setTimeFilter(e.target.value)}
+                            placeholder="Search by Time"
                             className="w-full px-3 py-2 border border-emerald-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
                         >
-                            <option value="">Any time</option>
-                            {timeOptions.map((time) => (
-                                <option key={time} value={time}>
-                                    {time}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    
-                    {/* Open Time Filter */}
-                    <div>
-                        <label htmlFor="open-time-filter" className="block text-sm font-medium text-emerald-700 mb-1">
-                            Opens Before
-                        </label>
-                        <select
-                            id="open-time-filter"
-                            value={openTimeFilter}
-                            onChange={(e) => setOpenTimeFilter(e.target.value)}
-                            className="w-full px-3 py-2 border border-emerald-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
-                        >
-                            <option value="">Any time</option>
-                            {timeOptions.map((time) => (
-                                <option key={time} value={time}>
-                                    {time}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    
-                    {/* Close Time Filter */}
-                    <div>
-                        <label htmlFor="close-time-filter" className="block text-sm font-medium text-emerald-700 mb-1">
-                            Closes After
-                        </label>
-                        <select
-                            id="close-time-filter"
-                            value={closeTimeFilter}
-                            onChange={(e) => setCloseTimeFilter(e.target.value)}
-                            className="w-full px-3 py-2 border border-emerald-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
-                        >
-                            <option value="">Any time</option>
-                            {timeOptions.map((time) => (
-                                <option key={time} value={time}>
-                                    {time}
-                                </option>
-                            ))}
-                        </select>
+                        </input>
                     </div>
                 </div>
                 

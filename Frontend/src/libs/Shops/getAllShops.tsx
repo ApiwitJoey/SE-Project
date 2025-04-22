@@ -1,10 +1,21 @@
-export default async function getAllShops(){
+import { ShopJson } from "../../../interfaces";
+
+export default async function getAllShops(queryString: string = ""): Promise<ShopJson> {
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+    const response = await fetch(`${apiUrl}/shops${queryString ? `?${queryString}` : ""}`);
     
-    const response = await fetch(`${process.env.BACKEND_URL}/api/v1/shops`)
-
-    if(!response.ok){
-        throw new Error("Failed to Get all shops")
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
     }
-
+    
     return await response.json();
+  } catch (error) {
+    console.error("Error fetching shops:", error);
+    return {
+      success: false,
+      count: 0,
+      data: [],
+    };
+  }
 }
