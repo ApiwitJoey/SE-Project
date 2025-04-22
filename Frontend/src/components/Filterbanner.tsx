@@ -58,7 +58,7 @@ export default function FilterBanner() {
                             type="text"
                             value={timeFilter}
                             onChange={(e) => setTimeFilter(e.target.value)}
-                            placeholder="Search by Time"
+                            placeholder="Search by open time(e.g.12:00)"
                             className="w-full px-3 py-2 border border-emerald-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-black"
                         >
                         </input>
