@@ -1,13 +1,29 @@
 'use client'
 import { FilledInput, FormControl, InputAdornment, InputLabel, TextField } from "@mui/material"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const EditShopServiceForm = ({ onSubmit, header } : { onSubmit: Function, header:string }) => {
+export interface PrevInfo {
+    serviceName: string,
+    price: string,
+    detail: string,
+    type: string
+}
+
+const EditShopServiceForm = ({ onSubmit, header, prevInfo } : { onSubmit: Function, header:string, prevInfo?:PrevInfo|undefined }) => {
 
     const [serviceName, setServiceName] = useState("");
-    const [price, setPrice] = useState<string>("");
+    const [price, setPrice] = useState("");
     const [detail, setDetail] = useState("");
     const [type, setType] = useState("");
+
+    useEffect(() => {
+        if (prevInfo) {
+            setServiceName(prevInfo.serviceName);
+            setPrice(prevInfo.price);
+            setDetail(prevInfo.detail);
+            setType(prevInfo.type);
+        }
+    }, [prevInfo]);
 
     return (
         <div className="max-w-md mx-auto bg-white shadow-lg rounded-xl p-6 border border-emerald-100 mb-6">

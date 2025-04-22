@@ -12,8 +12,11 @@ import deleteService from "@/libs/Service/deleteService";
 import updateService from "@/libs/Service/updateService";
 import Modal from "@/components/Modal";
 import ServiceCard from "@/components/ServiceCard";
+import { PrevInfo } from "@/components/EditShopServiceForm";
+import SuccessPopup from "@/components/SuccessPopup";
 
 const EditShopService = ({ params } : { params: { sid: string }}) => {
+    const [prevInfo, setPrevInfo] = useState<PrevInfo | undefined>(undefined);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentEditedServiceId, setCurrentEditedServiceId] = useState("")
@@ -21,6 +24,8 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
 
     const [error, setError] = useState("");
     const [success, setSuccess] = useState<string>("");
+    const [showEditSuccessPopup, setShowEditSuccessPopup] = useState(false); 
+    const [showDeleteSuccessPopup, setShowDeleteSuccessPopup] = useState(false); 
 
     const { data: session } = useSession();
     const token = session?.user.token;
@@ -126,15 +131,19 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                 if (!prevServices) return prevServices;
                 return prevServices.filter(service => service._id !== serviceId);
             });
+            setShowDeleteSuccessPopup(true);
         } catch (err) {
             const errMessage = err instanceof Error ? err.message : "Unexpected error occurred";
             setError(errMessage);
         }
     }
 
-    const handleEdit = async ( serviceName:string, price:string, detail:string ) => {
-        if(!serviceName && !price && !detail){
-            seteditedError("Please enter some informatin.");
+    const handleEdit = async ( serviceName:string, price:string, detail:string, type:string ) => {
+        setError("");
+        setSuccess("");
+
+        if(!serviceName && !price && !detail && !type){
+            seteditedError("Please enter some information.");
             return;
         }
 
@@ -147,6 +156,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
             name: serviceName || undefined,
             price: price ? parseFloat(price) : undefined,
             details: detail || undefined,
+            type: type || undefined
           };
 
         try {
@@ -161,6 +171,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                 })
             })
             setIsModalOpen(false);
+            setShowEditSuccessPopup(true);
         } catch (err) {
             const errMessage = err instanceof Error ? err.message : "Unexpected error occurred";
             setError(errMessage);
@@ -205,7 +216,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                         <p className="font-medium">{editedError}</p>
                     </div>
                 )}
-                <EditShopServiceForm onSubmit={handleEdit} header="Edit Sevice" />
+                <EditShopServiceForm onSubmit={handleEdit} header="Edit Sevice" prevInfo={prevInfo} />
             </Modal>
 
             <div className="max-w-md mx-auto"> 
@@ -220,7 +231,6 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                         <p className="font-medium">{error}</p>
                     </div>
                 )}
-
                 <EditShopServiceForm onSubmit={addNewService} header="Add New Sevice" />
             </div>
 
@@ -237,7 +247,12 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                             <ServiceCard 
                                 service={service} 
                                 isEditable={true} 
-                                editOnclick={() => {setIsModalOpen(true); setCurrentEditedServiceId(service._id); seteditedError("");}}
+                                editOnclick={() => {setCurrentEditedServiceId(service._id); seteditedError(""); setPrevInfo({
+                                    serviceName: service.name,
+                                    price: service.price.toString(),
+                                    detail: service.details,
+                                    type: service.type
+                                }); setIsModalOpen(true);}}
                                 deleteOnclick={handleDelete}
                             />
                         ))}
@@ -248,6 +263,18 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                     </p>
                 )}
             </div>
+            {showEditSuccessPopup && (
+                <SuccessPopup
+                    message="Service updated successfully!"
+                    onClose={() => setShowEditSuccessPopup(false)} // Close the success popup
+                />
+            )}
+            {showDeleteSuccessPopup && (
+                <SuccessPopup
+                    message="Service deleted successfully!"
+                    onClose={() => setShowDeleteSuccessPopup(false)} // Close the success popup
+                />
+            )}
         </div>
     </main>
   )
