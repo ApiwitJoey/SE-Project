@@ -2,8 +2,7 @@ import { ShopJson } from "../../../interfaces";
 
 export default async function getAllShops(queryString: string = ""): Promise<ShopJson> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
-    const response = await fetch(`${apiUrl}/shops${queryString ? `?${queryString}` : ""}`);
+    const response = await fetch(`${process.env.BACKEND_URL}/shops${queryString ? `?${queryString}` : ""}`);
     
     if (!response.ok) {
       throw new Error(`Error: ${response.status}`);
