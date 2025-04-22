@@ -141,11 +141,26 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
     const handleEdit = async ( serviceName:string, price:string, detail:string, type:string ) => {
         setError("");
         setSuccess("");
+        if(!currentEditedServiceId){
+            seteditedError("No service selected for editing.");
+            return;
+        }
 
         if(!serviceName && !price && !detail && !type){
             seteditedError("Please enter some information.");
             return;
         }
+
+        if (
+            prevInfo &&
+            prevInfo.serviceName === serviceName &&
+            prevInfo.price === price &&
+            prevInfo.detail === detail &&
+            prevInfo.type === type
+        ){
+            seteditedError("No changes made to the service.");
+            return;
+        };
 
         if(!token){
             seteditedError("Token not found. Cannot add a new service.");
