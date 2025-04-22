@@ -9,6 +9,14 @@ export default function FilterBanner() {
     // Get current filter values from URL or set defaults
     const [nameFilter, setNameFilter] = useState(searchParams.get('name') || '');
     const [timeFilter, setTimeFilter] = useState(searchParams.get('time') || '');
+
+    const timeOptions = [
+        "00:00", "01:00", "02:00", "03:00", "04:00",
+        "05:00", "06:00", "07:00", "08:00", "08:00",
+        "09:00", "10:00", "11:00", "12:00", "13:00",
+        "14:00", "15:00", "16:00", "17:00", "18:00",
+        "19:00", "20:00", "21:00", "22:00", "23:00", "24:00"
+    ];
     
     const handleFilter = (e: React.FormEvent) => {
         e.preventDefault();
@@ -53,15 +61,19 @@ export default function FilterBanner() {
                         <label htmlFor="time-filter" className="block text-sm font-medium text-emerald-700 mb-1">
                             Available At
                         </label>
-                        <input 
+                        <select
                             id="time-filter"
-                            type="text"
                             value={timeFilter}
                             onChange={(e) => setTimeFilter(e.target.value)}
-                            placeholder="Search by open time(e.g.12:00)"
                             className="w-full px-3 py-2 border border-emerald-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-black"
                         >
-                        </input>
+                            <option value="">Any time</option>
+                             {timeOptions.map((time) => (
+                                 <option key={time} value={time}>
+                                     {time}
+                                 </option>
+                            ))}
+                        </select>
                     </div>
                 </div>
                 
