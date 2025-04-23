@@ -34,6 +34,8 @@ export default function ProfilePage() {
   const [showConfirmBox, setShowConfirmBox] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false); 
   const [showSnackbar, setShowSnackbar] = useState(false);
+  const [showNameSnackbar, setShowNameSnackbar] = useState(false);
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -64,10 +66,16 @@ export default function ProfilePage() {
   const validatePhone = (phone: string) => /^0\d{8,9}$/.test(phone);
 
   const handleSave = () => {
+    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+      setShowNameSnackbar(true);
+      return;
+    }
+  
     if (!validatePhone(formData.telephone)) {
       setShowSnackbar(true);
       return;
     }
+  
     setShowConfirmBox(true);
   };
   
@@ -249,7 +257,7 @@ export default function ProfilePage() {
         )}
 
         {/* Snackbar for phone validation */}
-        {/* Snackbar for phone validation */}
+     
         <Snackbar
           open={showSnackbar}
           autoHideDuration={6000}
@@ -260,6 +268,18 @@ export default function ProfilePage() {
             กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (เริ่มด้วย 0 และมี 9-10 หลัก)
           </Alert>
         </Snackbar>
+
+        <Snackbar
+          open={showNameSnackbar}
+          autoHideDuration={6000}
+          onClose={() => setShowNameSnackbar(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          <Alert onClose={() => setShowNameSnackbar(false)} severity="error">
+            กรุณากรอกชื่อและนามสกุลให้ครบถ้วน
+          </Alert>
+        </Snackbar>
+
 
       </div>
     </div>
