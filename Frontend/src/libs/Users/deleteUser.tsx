@@ -7,6 +7,7 @@ export default async function deleteUser(id:string, token:string){
     })
 
     if(!response.ok){
+        console.log(response.json);
         throw new Error("Failed to delete user")
     }
 

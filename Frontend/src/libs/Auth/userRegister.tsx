@@ -1,22 +1,41 @@
+import { signIn } from "next-auth/react";
 export default async function userRegister(userName:string,userEmail:string, userPassword:string, userRole:string, userTelephone:string){
     
-    const response = await fetch(`${process.env.BACKEND_URL}/api/v1/auth/register`, {
-        method: 'POST',
-        headers: {
-            'Content-Type' : 'application/json'
-        },
-        body: JSON.stringify({
-            name: userName,
-            email: userEmail,
-            password: userPassword,
-            role: userRole,
-            telephone: userTelephone
-        })
-    });
+    try{
+        const response = await fetch(`${process.env.BACKEND_URL}/api/v1/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json'
+            },
+            body: JSON.stringify({
+                name: userName,
+                email: userEmail,
+                password: userPassword,
+                role: userRole,
+                telephone: userTelephone
+            })
+        });
+    
+        if(response.ok){
+            const data = await response.json();
 
-    // if(!response.ok){
-    //     throw new Error("Failed to register")
-    // }
+            await signIn('credentials', {
+                redirect: true,
+                email: userEmail,
+                password: userPassword,
+                callbackUrl: '/'
+            })
 
-    return await response.json();
+            return {
+                success: true,
+                message: data.message || "Registration successful!",
+            };
+        }
+        else {
+            return { success: false, message: "Registration failed." };
+          }
+    }
+    catch(err){
+        return { success: false, message: "An error occurred. Please try again." };
+    }
 }

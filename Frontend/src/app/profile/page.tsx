@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { AppDispatch, RootState } from "@/redux/store";
+import { useDispatch, useSelector } from "react-redux";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import getMyProfile from "@/libs/Auth/GetMyProfile";
 import updateMyProfile from "@/libs/Auth/UpdateMyProfile";
@@ -9,8 +11,13 @@ import ConfirmationPopup from "@/components/ConfirmPopup";
 import SuccessPopup from "@/components/SuccessPopup";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import deleteUser from "@/libs/Users/deleteUser";
+import { removeUser } from "@/redux/features/userSlice";
+import { signOut } from "next-auth/react";
+import userLogout from "@/libs/Auth/userLogout";
 
 export default function ProfilePage() {
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { data: session } = useSession();
   const token = session?.user?.token;
@@ -20,6 +27,7 @@ export default function ProfilePage() {
     email: "",
     telephone: "",
     role: "",
+    _id: "",
   });
 
   const [formData, setFormData] = useState({
@@ -32,12 +40,22 @@ export default function ProfilePage() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [showConfirmBox, setShowConfirmBox] = useState(false);
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false); 
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupProps, setPopupProps] = useState({
+    title: "",
+    message: "",
+    onConfirm: () => {},
+    onCancel: () => {},
+  });
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!token) return;
+      if (!token) {
+        console.log("No token available");
+        return;
+      }
       try {
         const data = await getMyProfile(token);
         const [firstName = "", lastName = ""] = data.data.name.split(" ");
@@ -70,7 +88,6 @@ export default function ProfilePage() {
     }
     setShowConfirmBox(true);
   };
-  
 
   const handleConfirmSave = async () => {
     if (!token) return;
@@ -109,15 +126,68 @@ export default function ProfilePage() {
     setIsEditing(false);
   };
 
-  const logout = () => {
-    router.push("/api/auth/signin");
+  const handleShowSignOutPopup = () => {
+    setPopupProps({
+      title: "Are you sure you want to sign out?",
+      message: "You will be logged out and redirected to the homepage.",
+      onConfirm: async () => {
+        await logout();
+        setShowPopup(false);
+      },
+      onCancel: () => setShowPopup(false),
+    });
+    setShowPopup(true);
+  };
+
+  const handleShowDeleteAccountPopup = () => {
+    setPopupProps({
+      title: "Are you sure you want to delete your account?",
+      message: "Your account will be gone forever, there is no redo.",
+      onConfirm: async () => {
+        await deleteAcc(user._id);
+        setShowPopup(false);
+      },
+      onCancel: () => setShowPopup(false),
+    });
+    setShowPopup(true);
+  };
+
+  const logout = async () => {
+    if (token) {
+      const response = await userLogout();
+      if (response.success) {
+        console.log("User logged out");
+        await signOut({ redirect : false });
+        router.push("/");
+        router.refresh();
+      }
+    }
+  };
+
+  const deleteAcc = async (id: string) => {
+    console.log("User id: " + id);
+    try{
+      if (id && token) {
+        const response = await deleteUser(id, token);
+        if (response.success) {
+          dispatch(removeUser(id));
+          logout();
+        }
+      }
+    }
+    catch(err){
+      console.log("Error Message : " + err);
+    }
   };
 
   return (
     <div className="min-h-screen pt-[80px] px-4 pb-16 bg-gradient-to-b from-white to-green-100 flex justify-center">
       <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-8 space-y-6">
         <div className="flex items-center gap-4 border-b border-gray-200 pb-4">
-          <AccountCircleIcon className="text-green-700" style={{ fontSize: 50 }} />
+          <AccountCircleIcon
+            className="text-green-700"
+            style={{ fontSize: 50 }}
+          />
           <div>
             <h2 className="text-3xl font-semibold text-green-900">
               {formData.firstName} {formData.lastName}
@@ -193,9 +263,17 @@ export default function ProfilePage() {
             <label className="font-medium text-gray-600">User Role</label>
             <span
               className={`w-fit self-start mt-1 px-3 py-1 text-sm font-medium text-white rounded 
-              ${formData.role ? (formData.role === "admin" ? "bg-green-800" : "bg-green-500") : "bg-gray-400"}`}
+              ${
+                formData.role
+                  ? formData.role === "admin"
+                    ? "bg-green-800"
+                    : "bg-green-500"
+                  : "bg-gray-400"
+              }`}
             >
-              {formData.role ? formData.role.charAt(0).toUpperCase() + formData.role.slice(1) : "Unknown Role"}
+              {formData.role
+                ? formData.role.charAt(0).toUpperCase() + formData.role.slice(1)
+                : "Unknown Role"}
             </span>
           </div>
         </div>
@@ -224,9 +302,17 @@ export default function ProfilePage() {
               Edit Profile
             </button>
           )}
+        </div>
 
+        <div className="flex justify-between">
           <button
-            onClick={logout}
+            className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded shadow-sm"
+            onClick={handleShowDeleteAccountPopup}
+          >
+            Delete Account
+          </button>
+          <button
+            onClick={handleShowSignOutPopup}
             className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded shadow-sm"
           >
             Sign Out
@@ -247,6 +333,14 @@ export default function ProfilePage() {
             onClose={() => setShowSuccessPopup(false)} // Close the success popup
           />
         )}
+        {showPopup && (
+          <ConfirmationPopup
+            title={popupProps.title}
+            message={popupProps.message}
+            onConfirm={popupProps.onConfirm}
+            onCancel={popupProps.onCancel}
+          />
+        )}
 
         {/* Snackbar for phone validation */}
         {/* Snackbar for phone validation */}
@@ -254,13 +348,12 @@ export default function ProfilePage() {
           open={showSnackbar}
           autoHideDuration={6000}
           onClose={() => setShowSnackbar(false)}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }} 
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
           <Alert onClose={() => setShowSnackbar(false)} severity="error">
             กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (เริ่มด้วย 0 และมี 9-10 หลัก)
           </Alert>
         </Snackbar>
-
       </div>
     </div>
   );
