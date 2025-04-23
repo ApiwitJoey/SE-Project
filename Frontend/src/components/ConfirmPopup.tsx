@@ -14,7 +14,7 @@ const ConfirmationPopup: React.FC<ConfirmationPopupProps> = ({ title, message, o
     <div className="mt-4">
         <button
         onClick={onConfirm}
-        className={`mr-2 px-4 py-2 text-white bg-${confirmColor}-600 hover:bg-${confirmColor}-700 rounded`}
+        className={`mr-2 px-4 py-2 text-white bg-red-600 bg-${confirmColor}-600 hover:bg-red-700 hover:bg-${confirmColor}-700 rounded`}
         >
         Confirm
         </button>
