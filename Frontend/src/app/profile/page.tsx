@@ -49,6 +49,7 @@ export default function ProfilePage() {
     message: "",
     onConfirm: () => {},
     onCancel: () => {},
+    confirmColor: "",
   });
 
   useEffect(() => {
@@ -142,6 +143,7 @@ export default function ProfilePage() {
         setShowPopup(false);
       },
       onCancel: () => setShowPopup(false),
+      confirmColor: "red",
     });
     setShowPopup(true);
   };
@@ -155,6 +157,7 @@ export default function ProfilePage() {
         setShowPopup(false);
       },
       onCancel: () => setShowPopup(false),
+      confirmColor: "red",
     });
     setShowPopup(true);
   };
@@ -328,10 +331,11 @@ export default function ProfilePage() {
 
         {showConfirmBox && (
           <ConfirmationPopup
-            title="Confirmationed"
+            title="Confirmation"
             message="Are you sure you want to save the changes?"
             onConfirm={handleConfirmSave}
             onCancel={() => setShowConfirmBox(false)}
+            confirmColor="green"
           />
         )}
         {showSuccessPopup && (
@@ -346,6 +350,7 @@ export default function ProfilePage() {
             message={popupProps.message}
             onConfirm={popupProps.onConfirm}
             onCancel={popupProps.onCancel}
+            confirmColor={popupProps.confirmColor}
           />
         )}
 
