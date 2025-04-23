@@ -106,6 +106,7 @@ export default function TopMenu() {
         
         {/* Right side with navigation links */}
         <div className="hidden md:flex items-center space-x-6">
+          <TopMenuItem title="Services" pageRef="/services" />
           <TopMenuItem title="Shops" pageRef="/shops" />
           <TopMenuItem title="Booking" pageRef="/booking" />
           {session?.user.role === "admin" && (
