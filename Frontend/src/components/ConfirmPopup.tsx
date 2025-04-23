@@ -3,7 +3,7 @@ interface ConfirmationPopupProps {
     message: string;
     onConfirm: () => void;
     onCancel: () => void;
-    confirmColor: string;
+    confirmColor?: string;
   }
   
 const ConfirmationPopup: React.FC<ConfirmationPopupProps> = ({ title, message, onConfirm, onCancel, confirmColor}) => (
