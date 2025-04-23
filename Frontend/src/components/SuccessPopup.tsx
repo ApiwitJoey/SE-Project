@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useEffect } from "react";
 
 interface SuccessPopupProps {
   message: string;
@@ -6,13 +7,22 @@ interface SuccessPopupProps {
 }
 
 const SuccessPopup: React.FC<SuccessPopupProps> = ({ message, onClose }) => {
+  useEffect(() => {
+    // Auto-close the popup after 3 seconds
+    const timer = setTimeout(() => {
+      onClose();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-8 rounded-xl shadow-lg max-w-sm w-full space-y-6">
+      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg w-11/12 sm:w-3/4 md:w-1/2 lg:w-2/5 xl:w-1/3 max-w-md mx-auto space-y-4">
         {/* Checkmark with Circular Spinner */}
-        <div className="flex justify-center items-center mb-6 relative">
+        <div className="flex justify-center items-center relative mb-4">
           {/* Spinner Circle */}
-          <div className="absolute w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
+          <div className="absolute w-12 h-12 sm:w-14 sm:h-14 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
           
           {/* Checkmark Icon */}
           <svg
@@ -24,20 +34,21 @@ const SuccessPopup: React.FC<SuccessPopupProps> = ({ message, onClose }) => {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            width="36"
-            height="36"
+            width="28"
+            height="28"
+            
           >
             <path d="M20 6L9 17l-5-5" />
           </svg>
         </div>
 
         {/* Success Message */}
-        <h3 className="text-green-600 font-semibold text-lg text-center">{message}</h3>
+        <h3 className="text-green-600 font-semibold text-base sm:text-lg text-center">{message}</h3>
 
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-300 ease-in-out"
+          className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-300 ease-in-out text-sm sm:text-base"
         >
           Close
         </button>

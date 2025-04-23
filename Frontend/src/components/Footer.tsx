@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="container mx-auto text-center">
         {/* Contact Section */}
         <div className="space-y-6">
-          <h3 className="text-3xl font-semibold text-white">Fonkenk Massage</h3>
+          <h3 className="text-3xl font-semibold text-white">Sabaai Massage</h3>
           <p className="text-lg text-green-100">Connect with us for your next relaxing escape</p>
 
           <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-16">
@@ -75,7 +75,7 @@ export default function Footer() {
 
         {/* Footer Copyright */}
         <div className="mt-8 border-t border-green-700 pt-6">
-          <p className="text-sm text-green-200">© {new Date().getFullYear()} Fonkenk Massage. All rights reserved.</p>
+          <p className="text-sm text-green-200">© {new Date().getFullYear()} Sabaai Massage. All rights reserved.</p>
         </div>
       </div>
     </div>

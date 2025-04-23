@@ -64,10 +64,10 @@ const ReservationCart = () => {
 
     if (reservationArr.length === 0) {
         return (
-            <div className="text-center py-16">
-                <div className="text-emerald-700 text-xl font-medium mb-4">No Reservations Found</div>
+            <div className="text-center py-8 sm:py-16">
+                <div className="text-emerald-700 text-lg sm:text-xl font-medium mb-3 sm:mb-4">No Reservations Found</div>
                 <Link href="/booking">
-                    <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg transition-colors">
+                    <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 sm:px-6 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg transition-colors">
                         Book Your First Session
                     </button>
                 </Link>
@@ -76,28 +76,28 @@ const ReservationCart = () => {
     }
 
     return (
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
             {connectedReservations.map((connectedReservation: ConnectedReservation) => (
                 <div 
-                    className="bg-white rounded-xl shadow-sm p-6 border border-emerald-100 hover:shadow-md transition-shadow" 
+                    className="bg-white rounded-lg sm:rounded-xl shadow-sm p-3 sm:p-6 border border-emerald-100 hover:shadow-md transition-shadow" 
                     key={connectedReservation._id}
                 >
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-3 sm:mb-4">
                         <div>
-                            <p className="text-sm text-emerald-600">Date</p>
-                            <p className="font-medium text-emerald-800">{connectedReservation.date}</p>
+                            <p className="text-xs sm:text-sm text-emerald-600">Date</p>
+                            <p className="text-sm sm:text-base font-medium text-emerald-800">{connectedReservation.date}</p>
                         </div>
                         <div>
-                            <p className="text-sm text-emerald-600">Spa Location</p>
-                            <p className="font-medium text-emerald-800">
+                            <p className="text-xs sm:text-sm text-emerald-600">Spa Location</p>
+                            <p className="text-sm sm:text-base font-medium text-emerald-800 truncate">
                                 {connectedReservation.shop?.name || "Not specified"}
                             </p>
                         </div>
                         <div>
-                            <p className="text-sm text-emerald-600">
+                            <p className="text-xs sm:text-sm text-emerald-600">
                                 {session?.user.role === 'admin' ? "Client" : "Your Name"}
                             </p>
-                            <p className="font-medium text-emerald-800">
+                            <p className="text-sm sm:text-base font-medium text-emerald-800 truncate">
                                 {session?.user.role === 'admin' 
                                     ? connectedReservation.userName 
                                     : session?.user.name}
@@ -107,17 +107,17 @@ const ReservationCart = () => {
                         {
                              connectedReservation.service ? 
                              <div>
-                                 <p className="text-sm text-emerald-600">
+                                 <p className="text-xs sm:text-sm text-emerald-600">
                                      Service
                                  </p>
                                  <div className="flex flex-col">
-                                     <p className="font-medium text-emerald-800">
+                                     <p className="text-sm sm:text-base font-medium text-emerald-800 truncate">
                                          {connectedReservation.service.name}
                                      </p>
-                                     <p className="font-medium text-emerald-800">
+                                     <p className="text-xs sm:text-sm font-medium text-emerald-700 truncate">
                                          {connectedReservation.service.details}
                                      </p>
-                                     <p className="font-medium text-emerald-800">
+                                     <p className="text-xs sm:text-sm font-medium text-emerald-800">
                                          {connectedReservation.service.price}
                                      </p>
                                  </div>
@@ -126,19 +126,19 @@ const ReservationCart = () => {
                          }
                     </div>
 
-                    <div className="flex justify-end space-x-4">
+                    <div className="flex flex-col sm:flex-row justify-end gap-2 sm:space-x-4 mt-3">
                         <button
-                            className="px-5 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors flex items-center"
+                            className="px-3 sm:px-5 py-1.5 sm:py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors flex items-center justify-center text-sm sm:justify-start"
                             onClick={() => deleteAction(connectedReservation._id, connectedReservation)}
                         >
-                            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                             Cancel
                         </button>
-                        <Link href={`edit/${connectedReservation._id}?shopId=${connectedReservation.shop?._id}&date=${connectedReservation.date}`}>
-                            <button className="px-5 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors flex items-center">
-                                <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <Link href={`edit/${connectedReservation._id}?shopId=${connectedReservation.shop?._id}&date=${connectedReservation.date}`} className="w-full sm:w-auto">
+                            <button className="w-full px-3 sm:px-5 py-1.5 sm:py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors flex items-center justify-center text-sm sm:justify-start">
+                                <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
                                 Reschedule
