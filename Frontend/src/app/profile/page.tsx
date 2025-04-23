@@ -2,8 +2,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { AppDispatch, RootState } from "@/redux/store";
-import { useDispatch, useSelector } from "react-redux";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import getMyProfile from "@/libs/Auth/GetMyProfile";
 import updateMyProfile from "@/libs/Auth/UpdateMyProfile";
@@ -11,13 +9,8 @@ import ConfirmationPopup from "@/components/ConfirmPopup";
 import SuccessPopup from "@/components/SuccessPopup";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import deleteUser from "@/libs/Users/deleteUser";
-import { removeUser } from "@/redux/features/userSlice";
-import { signOut } from "next-auth/react";
-import userLogout from "@/libs/Auth/userLogout";
 
 export default function ProfilePage() {
-  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { data: session } = useSession();
   const token = session?.user?.token;
@@ -27,7 +20,6 @@ export default function ProfilePage() {
     email: "",
     telephone: "",
     role: "",
-    _id: "",
   });
 
   const [formData, setFormData] = useState({
@@ -40,30 +32,13 @@ export default function ProfilePage() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [showConfirmBox, setShowConfirmBox] = useState(false);
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false); 
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [showNameSnackbar, setShowNameSnackbar] = useState(false);
-<<<<<<< HEAD
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupProps, setPopupProps] = useState({
-    title: "",
-    message: "",
-    onConfirm: () => {},
-    onCancel: () => {},
-  });
 
-||||||| parent of 5959c5f (Make Profile Page & My Booking Page Responsive)
-
-
-=======
-
->>>>>>> 5959c5f (Make Profile Page & My Booking Page Responsive)
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!token) {
-        console.log("No token available");
-        return;
-      }
+      if (!token) return;
       try {
         const data = await getMyProfile(token);
         const [firstName = "", lastName = ""] = data.data.name.split(" ");
@@ -140,79 +115,11 @@ export default function ProfilePage() {
     setIsEditing(false);
   };
 
-  const handleShowSignOutPopup = () => {
-    setPopupProps({
-      title: "Are you sure you want to sign out?",
-      message: "You will be logged out and redirected to the homepage.",
-      onConfirm: async () => {
-        await logout();
-        setShowPopup(false);
-      },
-      onCancel: () => setShowPopup(false),
-    });
-    setShowPopup(true);
-  };
-
-  const handleShowDeleteAccountPopup = () => {
-    setPopupProps({
-      title: "Are you sure you want to delete your account?",
-      message: "Your account will be gone forever, there is no redo.",
-      onConfirm: async () => {
-        await deleteAcc(user._id);
-        setShowPopup(false);
-      },
-      onCancel: () => setShowPopup(false),
-    });
-    setShowPopup(true);
-  };
-
-  const logout = async () => {
-    if (token) {
-      const response = await userLogout();
-      if (response.success) {
-        console.log("User logged out");
-        await signOut({ redirect : false });
-        router.push("/");
-        router.refresh();
-      }
-    }
-  };
-
-  const deleteAcc = async (id: string) => {
-    console.log("User id: " + id);
-    try{
-      if (id && token) {
-        const response = await deleteUser(id, token);
-        if (response.success) {
-          dispatch(removeUser(id));
-          logout();
-        }
-      }
-    }
-    catch(err){
-      console.log("Error Message : " + err);
-    }
+  const logout = () => {
+    router.push("/api/auth/signin");
   };
 
   return (
-<<<<<<< HEAD
-    <div className="min-h-screen pt-[80px] px-4 pb-16 bg-gradient-to-b from-white to-green-100 flex justify-center">
-      <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-8 space-y-6">
-        <div className="flex items-center gap-4 border-b border-gray-200 pb-4">
-          <AccountCircleIcon
-            className="text-green-700"
-            style={{ fontSize: 50 }}
-          />
-          <div>
-            <h2 className="text-3xl font-semibold text-green-900">
-||||||| parent of 5959c5f (Make Profile Page & My Booking Page Responsive)
-    <div className="min-h-screen pt-[80px] px-4 pb-16 bg-gradient-to-b from-white to-green-100 flex justify-center">
-      <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-8 space-y-6">
-        <div className="flex items-center gap-4 border-b border-gray-200 pb-4">
-          <AccountCircleIcon className="text-green-700" style={{ fontSize: 50 }} />
-          <div>
-            <h2 className="text-3xl font-semibold text-green-900">
-=======
     <div className="min-h-screen pt-16 sm:pt-20 md:pt-24 px-2 sm:px-4 pb-16 bg-gradient-to-b from-white to-green-100 flex justify-center">
       <div className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl bg-white rounded-lg sm:rounded-xl shadow-md sm:shadow-lg p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
         {/* Header with User Info */}
@@ -220,7 +127,6 @@ export default function ProfilePage() {
           <AccountCircleIcon className="text-green-700" style={{ fontSize: 45 }} />
           <div className="text-center sm:text-left">
             <h2 className="text-2xl sm:text-3xl font-semibold text-green-900">
->>>>>>> 5959c5f (Make Profile Page & My Booking Page Responsive)
               {formData.firstName} {formData.lastName}
             </h2>
             <p className="text-xs sm:text-sm text-gray-500">User Profile Overview</p>
@@ -293,26 +199,10 @@ export default function ProfilePage() {
           <div className="flex flex-col">
             <label className="font-medium text-gray-600 text-sm sm:text-base">User Role</label>
             <span
-<<<<<<< HEAD
-              className={`w-fit self-start mt-1 px-3 py-1 text-sm font-medium text-white rounded 
-              ${
-                formData.role
-                  ? formData.role === "admin"
-                    ? "bg-green-800"
-                    : "bg-green-500"
-                  : "bg-gray-400"
-              }`}
-||||||| parent of 5959c5f (Make Profile Page & My Booking Page Responsive)
-              className={`w-fit self-start mt-1 px-3 py-1 text-sm font-medium text-white rounded 
-              ${formData.role ? (formData.role === "admin" ? "bg-green-800" : "bg-green-500") : "bg-gray-400"}`}
-=======
               className={`w-fit self-start mt-1 px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-medium text-white rounded 
               ${formData.role ? (formData.role === "admin" ? "bg-green-800" : "bg-green-500") : "bg-gray-400"}`}
->>>>>>> 5959c5f (Make Profile Page & My Booking Page Responsive)
             >
-              {formData.role
-                ? formData.role.charAt(0).toUpperCase() + formData.role.slice(1)
-                : "Unknown Role"}
+              {formData.role ? formData.role.charAt(0).toUpperCase() + formData.role.slice(1) : "Unknown Role"}
             </span>
           </div>
         </div>
@@ -342,26 +232,10 @@ export default function ProfilePage() {
               Edit Profile
             </button>
           )}
-        </div>
 
-        <div className="flex justify-between">
           <button
-<<<<<<< HEAD
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded shadow-sm"
-            onClick={handleShowDeleteAccountPopup}
-          >
-            Delete Account
-          </button>
-          <button
-            onClick={handleShowSignOutPopup}
-            className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded shadow-sm"
-||||||| parent of 5959c5f (Make Profile Page & My Booking Page Responsive)
-            onClick={logout}
-            className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded shadow-sm"
-=======
             onClick={logout}
             className={`bg-red-500 hover:bg-red-600 text-white px-3 sm:px-4 py-1 sm:py-1.5 rounded shadow-sm text-sm ${isEditing ? "mt-2 sm:mt-0" : ""}`}
->>>>>>> 5959c5f (Make Profile Page & My Booking Page Responsive)
           >
             Sign Out
           </button>
@@ -381,21 +255,13 @@ export default function ProfilePage() {
             onClose={() => setShowSuccessPopup(false)}
           />
         )}
-        {showPopup && (
-          <ConfirmationPopup
-            title={popupProps.title}
-            message={popupProps.message}
-            onConfirm={popupProps.onConfirm}
-            onCancel={popupProps.onCancel}
-          />
-        )}
 
         {/* Snackbars */}
         <Snackbar
           open={showSnackbar}
           autoHideDuration={6000}
           onClose={() => setShowSnackbar(false)}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }} 
         >
           <Alert onClose={() => setShowSnackbar(false)} severity="error">
             กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (เริ่มด้วย 0 และมี 9-10 หลัก)
