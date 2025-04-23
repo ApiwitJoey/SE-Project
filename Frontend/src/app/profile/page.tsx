@@ -58,11 +58,13 @@ export default function ProfilePage() {
     fetchUserData();
   }, [token]);
 
-  const handleChange = (e) => {
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const validatePhone = (phone) => /^0\d{8,9}$/.test(phone);
+  
+  const validatePhone = (phone: string): boolean => /^0\d{8,9}$/.test(phone);
 
   const handleSave = () => {
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
