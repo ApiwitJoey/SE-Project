@@ -9,7 +9,7 @@ const MyBookingPage = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-4 sm:mb-10">
           <h1 className="text-xl sm:text-3xl font-bold text-emerald-800 mb-1 sm:mb-2">
-            {session.data?.user.name}'s Massage Bookings
+            {session.data?.user.username}'s Massage Bookings
           </h1>
           <p className="text-sm sm:text-base text-emerald-600 max-w-2xl mx-auto">
             View and manage your upcoming relaxation sessions

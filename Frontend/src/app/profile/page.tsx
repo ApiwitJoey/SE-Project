@@ -193,18 +193,26 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen pt-[80px] px-4 pb-16 bg-gradient-to-b from-white to-green-100 flex justify-center">
       <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-8 space-y-6">
-        <div className="flex items-center gap-4 border-b border-gray-200 pb-4">
-          <AccountCircleIcon
-            className="text-green-700"
-            style={{ fontSize: 50 }}
-          />
-          <div>
-            <h2 className="text-3xl font-semibold text-green-900">
-              {formData.firstName} {formData.lastName}
-            </h2>
-            <p className="text-sm text-gray-500">User Profile Overview</p>
-          </div>
+      <div className="flex items-center gap-4 border-b border-gray-200 pb-4">
+      <AccountCircleIcon
+        className="text-green-700"
+        style={{ fontSize: 50 }}
+      />
+      <div className="flex flex-col">
+        <div className="flex items-center gap-3">
+          <h2 className="text-3xl font-semibold text-green-900">
+            {formData.firstName} {formData.lastName}
+          </h2>
+          {formData.role === "admin" && (
+            <span className="px-3 py-1 text-sm font-medium text-white rounded bg-green-800">
+              Admin
+            </span>
+          )}
         </div>
+        <p className="text-sm text-gray-500">User Profile Overview</p>
+      </div>
+    </div>
+
 
         <div className="grid gap-4 text-sm md:text-base text-gray-700">
           {/* First + Last Name */}
@@ -266,25 +274,6 @@ export default function ProfilePage() {
             ) : (
               <span className="mt-1">{formData.telephone || "-"}</span>
             )}
-          </div>
-
-          {/* Role */}
-          <div className="flex flex-col">
-            <label className="font-medium text-gray-600">User Role</label>
-            <span
-              className={`w-fit self-start mt-1 px-3 py-1 text-sm font-medium text-white rounded 
-              ${
-                formData.role
-                  ? formData.role === "admin"
-                    ? "bg-green-800"
-                    : "bg-green-500"
-                  : "bg-gray-400"
-              }`}
-            >
-              {formData.role
-                ? formData.role.charAt(0).toUpperCase() + formData.role.slice(1)
-                : "Unknown Role"}
-            </span>
           </div>
         </div>
 
