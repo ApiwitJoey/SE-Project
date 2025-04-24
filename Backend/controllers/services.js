@@ -117,6 +117,7 @@ exports.createService = async (req, res, next) => {
             massageType: decodeHtmlEntities(req.body.massageType),
             details: decodeHtmlEntities(req.body.details)
         };
+        console.log(decodedBody)
 
         const service = await Service.create(decodedBody);
         const populatedService = await service.populate('shop');
@@ -162,6 +163,7 @@ exports.updateService = async (req, res, next) => {
             massageType: req.body.massageType ? decodeHtmlEntities(req.body.massageType) : undefined,
             details: req.body.details ? decodeHtmlEntities(req.body.details) : undefined
         };
+        console.log(decodedBody)
 
         service = await Service.findByIdAndUpdate(req.params.id, decodedBody, {
             new: true,

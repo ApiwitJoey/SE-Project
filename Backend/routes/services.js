@@ -10,7 +10,6 @@ const {
   updateService,
   deleteService,
 } = require("../controllers/services");
-const { targetAreas, massageTypes } = require("../models/ServiceType");
 
 
 // Protect is used to check if the user is logged in
@@ -20,28 +19,14 @@ router.get("/", getServices);
 router.post(
   "/", [
     protect,
-    authorize("admin", "user"),
-    check("targetArea")
-      .isIn(targetAreas)
-      .withMessage(`Target area must be one of: ${targetAreas.join(", ")}`),
-    check("massageType")
-      .isIn(massageTypes)
-      .withMessage(`Massage type must be one of: ${massageTypes.join(", ")}`),
+    authorize("admin", "user")
   ], 
   createService); // from shops first
 router.put(
   "/:id", 
   [
   protect,
-  authorize("admin", "user"),
-  check("targetArea")
-    .optional() // ไม่บังคับกรอก แต่ถ้ากรอกต้องถูกต้อง
-    .isIn(targetAreas)
-    .withMessage(`Target area must be one of: ${targetAreas.join(", ")}`),
-  check("massageType")
-    .optional() // ไม่บังคับกรอก แต่ถ้ากรอกต้องถูกต้อง
-    .isIn(massageTypes)
-    .withMessage(`Massage type must be one of: ${massageTypes.join(", ")}`),
+  authorize("admin", "user")
   ],
   updateService);
 router.delete("/:id", protect, authorize("admin", "user"), deleteService);
