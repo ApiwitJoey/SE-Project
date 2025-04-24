@@ -8,13 +8,14 @@ import CircularProgress from "@mui/material/CircularProgress";
 const SignUp = () => {
   const router = useRouter();
 
-  const [name, setName] = useState("");
+  const [FirstName, setFirstName] = useState("");
+  const [LastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [tel, setTel] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
+  
   const handleSignUp = async (e: React.FormEvent) => {
     const role = "user";
     e.preventDefault();
@@ -33,9 +34,9 @@ const SignUp = () => {
       return;
     }
 
-    if (name && email && password && role && tel) {
+    if (FirstName && LastName && email && password && role && tel) {
       try {
-        const response = await userRegister(name, email, password, role, tel);
+        const response = await userRegister(FirstName,LastName, email, password, role, tel);
         if (response.success) {
           router.push("/");
         } else {
@@ -93,8 +94,12 @@ const SignUp = () => {
           )}
           <form onSubmit={handleSignUp} className="space-y-6">
             <InputForm
-              onInputChange={(value: string) => setName(value)}
-              labelText="Full Name"
+              onInputChange={(value: string) => setFirstName(value)}
+              labelText="First Name"
+            />
+            <InputForm
+              onInputChange={(value: string) => setLastName(value)}
+              labelText="Last Name"
             />
             <InputForm
               onInputChange={(value: string) => setEmail(value)}

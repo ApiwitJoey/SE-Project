@@ -1,5 +1,5 @@
 import { signIn } from "next-auth/react";
-export default async function userRegister(userName:string,userEmail:string, userPassword:string, userRole:string, userTelephone:string){
+export default async function userRegister(userFirstName:string,userLastName:string,userEmail:string, userPassword:string, userRole:string, userTelephone:string){
     
     try{
         const response = await fetch(`${process.env.BACKEND_URL}/api/v1/auth/register`, {
@@ -8,7 +8,8 @@ export default async function userRegister(userName:string,userEmail:string, use
                 'Content-Type' : 'application/json'
             },
             body: JSON.stringify({
-                name: userName,
+                FirstName:userFirstName,
+                LastName: userLastName,
                 email: userEmail,
                 password: userPassword,
                 role: userRole,
