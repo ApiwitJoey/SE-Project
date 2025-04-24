@@ -5,10 +5,11 @@ const nodemailer = require("nodemailer");
 // POST public
 exports.register = async (req, res, next) => {
   try {
-    const { name, email, password, role, telephone } = req.body;
+    const { firstname,lastname, email, password, role, telephone } = req.body;
 
     const user = await User.create({
-      name,
+      firstname,
+      lastname,
       email,
       role,
       password,
@@ -87,7 +88,8 @@ exports.getMe = async (req, res, next) => {
 exports.updateMe = async (req, res, next) => {
   try {
     const updates = {
-      name: req.body.name,
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
       telephone: req.body.telephone,
       
     };
@@ -199,7 +201,9 @@ const sendTokenResponse = (user, statusCode, res) => {
 
   const role = user.role;
   const email = user.email;
-  const name = user.name;
+  const firstname = user.firstname;
+  const lastname = user.lastname;
+  const name = `${firstname} ${lastname}`;
 
   res
     .status(statusCode)
@@ -261,8 +265,8 @@ exports.forgotPassword = async (req, res, next) => {
       console.log('Attempting to send email...');
       await sendEmail({
         email: user.email,
-        subject: '[SABAAI Massage] Reset Password Code Account: ' + user.name,
-        toUser : user.name,
+        subject: '[SABAAI Massage] Reset Password Code Account: ' + user.firstname + ' ' + user.lastname,
+        toUser : user.firstname + ' ' + user.lastname,
         OTP: otp,
         html: `<div style="max-width: 700px; margin: 40px auto; padding: 40px 30px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2); border: 1px solid #d1fae5;">
     <div style="text-align: center; margin-bottom: 30px;">

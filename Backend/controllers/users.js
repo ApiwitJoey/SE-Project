@@ -71,14 +71,14 @@ exports.deleteUser = async (req, res, next) => {
     await sendEmail({
       email: user.email,
       subject: "[SABAAI Massage] Your Account Has Been Deleted",
-      toUser: user.name,
+      toUser: user.firstname + " " + user.lastname,
       OTP: null,
       html: `<div style="max-width: 700px; margin: 40px auto; padding: 40px 30px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2); border: 1px solid #d1fae5;">
     <div style="text-align: center; margin-bottom: 30px;">
     <img src="https://i.postimg.cc/4xrSTJhz/temp-Image-BMx-Ka-M.avif" alt="SABAAI Logo" style="max-width: 200px; border-radius: 10px;" />
     </div>
     
-    <h2 style="text-align: center; font-size: 24px; color: #065f46; margin-bottom: 20px;">Hi ${user.name},</h2>
+    <h2 style="text-align: center; font-size: 24px; color: #065f46; margin-bottom: 20px;">Hi ${user.firstname},</h2>
     
     <p style="font-size: 16px; color: #10b981; font-weight: bold; margin-top: 30px;">Your SABAAI account has been deleted successfully.</p>
     
