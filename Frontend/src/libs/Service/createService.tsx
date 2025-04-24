@@ -1,7 +1,7 @@
 import { CreateServiceDto } from "../../../interfaces";
 
 export default async function createService(shopId: string, token: string, body:CreateServiceDto) {
-  
+    
     const response = await fetch(`${process.env.BACKEND_URL}/api/v1/shops/${shopId}/services/`, {
       method: 'POST',
       headers: {

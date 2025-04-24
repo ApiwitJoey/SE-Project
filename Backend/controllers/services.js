@@ -2,6 +2,16 @@ const Shop = require("../models/Shop");
 const Service = require("../models/Service");
 const { validationResult } = require("express-validator");
 
+// Helper function to decode HTML entities
+const decodeHtmlEntities = (text) => {
+    if (!text) return text;
+    return text.replace(/&amp;/g, '&')
+              .replace(/&lt;/g, '<')
+              .replace(/&gt;/g, '>')
+              .replace(/&quot;/g, '"')
+              .replace(/&#039;/g, "'");
+};
+
 // @desc Get one Service
 // @route GET /api/v1/services/:id
 // @access Private
@@ -98,7 +108,15 @@ exports.createService = async (req, res, next) => {
                 message: `Only admin can create more service`,
             })
         }
-        const service = await Service.create(req.body);
+
+        // Decode HTML entities in the request body
+        const decodedBody = {
+            ...req.body,
+            name: decodeHtmlEntities(req.body.name),
+            details: decodeHtmlEntities(req.body.details)
+        };
+
+        const service = await Service.create(decodedBody);
         const populatedService = await service.populate('shop');
         res.status(201).json({ success: true, data: populatedService });
     } catch (err) {
@@ -133,7 +151,15 @@ exports.updateService = async (req, res, next) => {
                 message: `Only admin can manipulate service`,
             });
         }
-        service = await Service.findByIdAndUpdate(req.params.id, req.body, {
+
+        // Decode HTML entities in the request body
+        const decodedBody = {
+            ...req.body,
+            name: req.body.name ? decodeHtmlEntities(req.body.name) : undefined,
+            details: req.body.details ? decodeHtmlEntities(req.body.details) : undefined
+        };
+
+        service = await Service.findByIdAndUpdate(req.params.id, decodedBody, {
             new: true,
             runValidators: true,
         });
