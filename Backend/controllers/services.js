@@ -47,6 +47,12 @@ exports.getServices = async (req, res, next) => {
         });
     }
 
+    // Pagination
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const startIndex = (page - 1) * limit;
+    query = query.skip(startIndex).limit(limit);
+
     try {
         const service = await query;
         res.status(200).json({
