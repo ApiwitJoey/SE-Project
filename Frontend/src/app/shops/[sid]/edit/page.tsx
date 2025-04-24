@@ -60,10 +60,15 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
         fetchShop();
     }, []);
 
-    const addNewService = async ( serviceName:string, price:string, detail:string, type:string ) => {
+    const addNewService = async ( serviceName:string, price:string, detail:string, targetArea:string, massageType:string ) => {
         setError("");
         setSuccess("");
         const parsedPrice = parseFloat(price);
+
+        if(parsedPrice < 0){
+            setError("Price cannot be negative. Please enter a valid amount.");
+            return;
+        }
 
         if(!serviceName){
             setError("Please enter a service name.");
@@ -80,8 +85,13 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
             return;
         }
 
-        if(!type){
-            setError("Please enter the service type.");
+        if(!targetArea){
+            setError("Please select a target area.");
+            return;
+        }
+
+        if(!massageType){
+            setError("Please select a massage type.");
             return;
         }
 
@@ -100,7 +110,8 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
             name: serviceName,
             price: parsedPrice,
             details: detail,
-            type: type
+            targetArea: targetArea,
+            massageType: massageType
         }
         try {
             const response = await createService(shopDetail?._id, token, body);
@@ -138,7 +149,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
         }
     }
 
-    const handleEdit = async ( serviceName:string, price:string, detail:string, type:string ) => {
+    const handleEdit = async ( serviceName:string, price:string, detail:string, targetArea:string, massageType:string ) => {
         setError("");
         setSuccess("");
         if(!currentEditedServiceId){
@@ -146,7 +157,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
             return;
         }
 
-        if(!serviceName && !price && !detail && !type){
+        if(!serviceName && !price && !detail && !targetArea && !massageType){
             seteditedError("Please enter some information.");
             return;
         }
@@ -156,7 +167,8 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
             prevInfo.serviceName === serviceName &&
             prevInfo.price === price &&
             prevInfo.detail === detail &&
-            prevInfo.type === type
+            prevInfo.targetArea === targetArea &&
+            prevInfo.massageType === massageType
         ){
             seteditedError("No changes made to the service.");
             return;
@@ -171,8 +183,9 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
             name: serviceName || undefined,
             price: price ? parseFloat(price) : undefined,
             details: detail || undefined,
-            type: type || undefined
-          };
+            targetArea: targetArea || undefined,
+            massageType: massageType || undefined
+        };
 
         try {
             const response = await updateService(currentEditedServiceId, token, body);
@@ -266,7 +279,8 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                                     serviceName: service.name,
                                     price: service.price.toString(),
                                     detail: service.details,
-                                    type: service.type
+                                    targetArea: service.targetArea,
+                                    massageType: service.massageType
                                 }); setIsModalOpen(true);}}
                                 deleteOnclick={handleDelete}
                             />

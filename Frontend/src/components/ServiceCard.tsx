@@ -13,14 +13,17 @@ const ServiceCard = ({service, isEditable, deleteOnclick, editOnclick} : {servic
         <h3 className="text-xl font-medium text-emerald-800 mb-2">
             {service.name}
         </h3>
-        <p className="text-emerald-700 mb-3">
-            {service.details}
-        </p>
-        <p className="text-emerald-600 font-bold">
+        <div className="text-emerald-600 font-medium">
             ${service.price}
-        </p>
-        <p className="text-emerald-600 font-bold mb-3">
-            {service.type}
+        </div>
+        <div className="text-emerald-600 font-medium">
+            Target Area: {service.targetArea}
+        </div>
+        <div className="text-emerald-600 font-medium">
+            Massage Type: {service.massageType}
+        </div>
+        <p className="text-emerald-700 mt-2">
+            {service.details}
         </p>
 
         {

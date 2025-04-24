@@ -38,7 +38,8 @@ export interface Service {
     name: string,
     price: number,
     details: string,
-    type: string
+    targetArea: string,
+    massageType: string
 }
 
 export interface ServiceJson {
@@ -80,7 +81,8 @@ export interface CreateServiceDto {
     name: string,
     price: number,
     details: string,
-    type: string
+    targetArea: string,
+    massageType: string
 }
 
 export interface UpdateServiceDto {
@@ -88,6 +90,7 @@ export interface UpdateServiceDto {
     name?: string,
     price?: number,
     details?: string,
-    type?: string
+    targetArea?: string,
+    massageType?: string
 }
 
