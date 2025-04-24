@@ -1,5 +1,6 @@
 const express = require("express");
 const { protect, authorize } = require("../middleware/auth");
+const { check } = require("express-validator");
 const router = express.Router({ mergeParams: true });
 
 const {

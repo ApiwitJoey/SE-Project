@@ -1,5 +1,6 @@
 const Shop = require("../models/Shop");
 const Service = require("../models/Service");
+const { validationResult } = require("express-validator");
 
 // @desc Get one Service
 // @route GET /api/v1/services/:id
@@ -73,6 +74,15 @@ exports.getServices = async (req, res, next) => {
 // note : this always get call in context of a shop
 exports.createService = async (req, res, next) => {
     try {
+        // Check for validation errors
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+
         req.body.shop = req.params.shopId;
         const shop = await Shop.findById(req.params.shopId);
         if (!shop) {
@@ -93,6 +103,12 @@ exports.createService = async (req, res, next) => {
         res.status(201).json({ success: true, data: populatedService });
     } catch (err) {
         console.log(err.stack);
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({
+                success: false,
+                message: Object.values(err.errors).map(val => val.message)
+            });
+        }
         return res
             .status(500)
             .json({ success: false, message: "Cannot create Service" });

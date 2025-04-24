@@ -140,7 +140,7 @@ export default function ServiceList() {
                                             />
                                         </svg>
                                         <span>
-                                            {serviceItem.shop.name}
+                                        {serviceItem.shop?.name || 'No Shop'}
                                         </span>
                                     </div>
                                 </div>
