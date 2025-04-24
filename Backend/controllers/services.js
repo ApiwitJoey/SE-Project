@@ -113,6 +113,8 @@ exports.createService = async (req, res, next) => {
         const decodedBody = {
             ...req.body,
             name: decodeHtmlEntities(req.body.name),
+            targetArea: decodeHtmlEntities(req.body.targetArea),
+            massageType: decodeHtmlEntities(req.body.massageType),
             details: decodeHtmlEntities(req.body.details)
         };
 
@@ -156,6 +158,8 @@ exports.updateService = async (req, res, next) => {
         const decodedBody = {
             ...req.body,
             name: req.body.name ? decodeHtmlEntities(req.body.name) : undefined,
+            targetArea: req.body.targetArea ? decodeHtmlEntities(req.body.targetArea) : undefined,
+            massageType: req.body.massageType ? decodeHtmlEntities(req.body.massageType) : undefined,
             details: req.body.details ? decodeHtmlEntities(req.body.details) : undefined
         };
 
