@@ -8,6 +8,7 @@ export default async function userRegister(userName:string,userFirstName:string,
                 'Content-Type' : 'application/json'
             },
             body: JSON.stringify({
+                
                 username:userName,
                 firstname:userFirstName,
                 lastname: userLastName,
