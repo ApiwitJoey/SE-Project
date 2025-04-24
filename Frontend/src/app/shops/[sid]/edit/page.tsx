@@ -109,9 +109,9 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
             shop: shopDetail._id,
             name: serviceName,
             price: parsedPrice,
-            details: detail,
             targetArea: targetArea,
-            massageType: massageType
+            massageType: massageType,
+            details: detail
         }
         try {
             const response = await createService(shopDetail?._id, token, body);
