@@ -78,7 +78,7 @@ exports.deleteUser = async (req, res, next) => {
     <img src="https://i.postimg.cc/4xrSTJhz/temp-Image-BMx-Ka-M.avif" alt="SABAAI Logo" style="max-width: 200px; border-radius: 10px;" />
     </div>
     
-    <h2 style="text-align: center; font-size: 24px; color: #065f46; margin-bottom: 20px;">Hi ${user.firstname},</h2>
+    <h2 style="text-align: center; font-size: 24px; color: #065f46; margin-bottom: 20px;">Hi ${user.username},</h2>
     
     <p style="font-size: 16px; color: #10b981; font-weight: bold; margin-top: 30px;">Your SABAAI account has been deleted successfully.</p>
     
