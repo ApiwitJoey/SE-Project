@@ -5,9 +5,10 @@ const nodemailer = require("nodemailer");
 // POST public
 exports.register = async (req, res, next) => {
   try {
-    const { firstname,lastname, email, password, role, telephone } = req.body;
+    const { username,firstname,lastname, email, password, role, telephone } = req.body;
 
     const user = await User.create({
+      username,
       firstname,
       lastname,
       email,
@@ -88,6 +89,7 @@ exports.getMe = async (req, res, next) => {
 exports.updateMe = async (req, res, next) => {
   try {
     const updates = {
+      username: req.body.username,
       firstname: req.body.firstname,
       lastname: req.body.lastname,
       telephone: req.body.telephone,
@@ -201,14 +203,14 @@ const sendTokenResponse = (user, statusCode, res) => {
 
   const role = user.role;
   const email = user.email;
-  const firstname = user.firstname;
+  const username = user.username;
+  const firstname = user.firstname; 
   const lastname = user.lastname;
-  const name = `${firstname} ${lastname}`;
 
   res
     .status(statusCode)
     .cookie("token", token, options)
-    .json({ success: true, token, email, role, name });
+    .json({ success: true, token, email, role, username });
 };
 
 // resetpassword

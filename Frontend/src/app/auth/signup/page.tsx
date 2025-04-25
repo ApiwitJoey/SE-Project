@@ -8,6 +8,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 const SignUp = () => {
   const router = useRouter();
 
+  const [UserName, setUserName] = useState("");
   const [FirstName, setFirstName] = useState("");
   const [LastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -34,9 +35,9 @@ const SignUp = () => {
       return;
     }
 
-    if (FirstName && LastName && email && password && role && tel) {
+    if (UserName && FirstName && LastName && email && password && role && tel) {
       try {
-        const response = await userRegister(FirstName,LastName, email, password, role, tel);
+        const response = await userRegister(UserName,FirstName,LastName, email, password, role, tel);
         if (response.success) {
           router.push("/");
         } else {
@@ -93,6 +94,10 @@ const SignUp = () => {
             </div>
           )}
           <form onSubmit={handleSignUp} className="space-y-6">
+            <InputForm
+              onInputChange={(value: string) => setUserName(value)}
+              labelText="UserName"
+            />
             <InputForm
               onInputChange={(value: string) => setFirstName(value)}
               labelText="First Name"
