@@ -1,6 +1,6 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const { app, server } = require('../../server');
+const app = require('../../server')
 const Service = require('../../models/Service');
 const Shop = require('../../models/Shop');
 const User = require('../../models/User');
@@ -20,14 +20,14 @@ let userToken;
 // authentication setup
 beforeAll(async () => {
   // Login to get tokens once for all tests
-  const adminRes = await request(server).post('/api/v1/auth/login').send(TEST_ADMIN);
+  const adminRes = await request(app).post('/api/v1/auth/login').send(TEST_ADMIN);
   adminToken = adminRes.body.token;
-  const userRes = await request(server).post('/api/v1/auth/login').send(TEST_USER);
+  const userRes = await request(app).post('/api/v1/auth/login').send(TEST_USER);
   userToken = userRes.body.token;
 });
 afterAll(async () => {
   // Close the server and DB connection
-  await server.close();
+  // await app.close();
   await mongoose.connection.close();
 });
 
@@ -57,7 +57,7 @@ describe('POST /api/v1/shops/:shopId/services', () => {
   // *** Authentication test ***
   // 1) Admin user with valid token (happy path)
   it('should create a new service', async () => {
-    const res = await request(server) // Use server instead of app
+    const res = await request(app) // Use app instead of app
       .post(`/api/v1/shops/${testShop._id}/services`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
@@ -72,7 +72,7 @@ describe('POST /api/v1/shops/:shopId/services', () => {
   });
   // 2) Regular user attempt
   it('should not be able to create new service', async () => {
-    const res = await request(server)
+    const res = await request(app)
       .post(`/api/v1/shops/${testShop._id}/services`)
       .set('Authorization', `Bearer ${userToken}`)
       .send({
@@ -88,7 +88,7 @@ describe('POST /api/v1/shops/:shopId/services', () => {
   // *** Shop validation test ***
   // 1) Invalid shop ID
   it('should not be able to create new service because provided shopId doesn\'t exist', async () => {
-    const res = await request(server)
+    const res = await request(app)
       .post(`/api/v1/shops/${6969}/services`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
@@ -129,7 +129,7 @@ describe('PUT /api/v1/services/:id', () => {
   // *** Authentication test ***
   // 1) Admin user with valid token (happy path)
   it('should edit the existed service', async () => {
-    const res = await request(server)
+    const res = await request(app)
       .put(`/api/v1/services/${testService._id}`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
@@ -146,7 +146,7 @@ describe('PUT /api/v1/services/:id', () => {
   });
   // 2) User cannot edit
   it('should not be able to edit the existed service', async () => {
-    const res = await request(server)
+    const res = await request(app)
       .put(`/api/v1/services/${testService._id}`)
       .set('Authorization', `Bearer ${userToken}`)
       .send({
@@ -160,7 +160,7 @@ describe('PUT /api/v1/services/:id', () => {
   // 1) Service ID is not existed and should not be able to edit it 
   it('should return 404 if service ID does not exist', async () => {
     const fakeId = new mongoose.Types.ObjectId();
-    await request(server)
+    await request(app)
       .put(`/api/v1/services/${fakeId}`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({ name: 'Ghost Update' })
@@ -185,7 +185,7 @@ describe('DELETE /api/v1/services/:id', () => {
   // 1) Admin user with valid token (happy path)
   it('should delete the existed service', async () => {
     testService = await Service.create(serviceTesterData);
-    const res = await request(server)
+    const res = await request(app)
       .delete(`/api/v1/services/${testService._id}`)
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(200);
@@ -194,7 +194,7 @@ describe('DELETE /api/v1/services/:id', () => {
   });
   // 2) User cannot delete
   it('should not be able to delete the existed service', async () => {
-    const res = await request(server)
+    const res = await request(app)
       .delete(`/api/v1/services/${testService._id}`)
       .set('Authorization', `Bearer ${userToken}`)
     const service = await Service.findById(testService._id);
@@ -208,7 +208,7 @@ describe('DELETE /api/v1/services/:id', () => {
   // 1) Service ID is not existed and should not be able to edit it 
   it('should return 404 if service ID does not exist', async () => {
     const fakeId = new mongoose.Types.ObjectId();
-    await request(server)
+    await request(app)
       .delete(`/api/v1/services/${fakeId}`)
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(404);
