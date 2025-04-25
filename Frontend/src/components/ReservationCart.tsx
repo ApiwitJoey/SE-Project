@@ -100,7 +100,7 @@ const ReservationCart = () => {
                             <p className="text-sm sm:text-base font-medium text-emerald-800 truncate">
                                 {session?.user.role === 'admin' 
                                     ? connectedReservation.userName 
-                                    : session?.user.name}
+                                    : session?.user.username}
                             </p>
                         </div>
 
