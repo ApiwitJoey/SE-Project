@@ -200,6 +200,8 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
             })
             setIsModalOpen(false);
             setShowEditSuccessPopup(true);
+            setPrevInfo(undefined);
+            setCurrentEditedServiceId("");
         } catch (err) {
             const errMessage = err instanceof Error ? err.message : "Unexpected error occurred";
             setError(errMessage);
