@@ -23,7 +23,9 @@ export default function ProfilePage() {
   const token = session?.user?.token;
 
   const [user, setUser] = useState({
-    name: "",
+    userName: "",
+    firstName: "",
+    lastName: "",
     email: "",
     telephone: "",
     role: "",
@@ -31,6 +33,7 @@ export default function ProfilePage() {
   });
 
   const [formData, setFormData] = useState({
+    userName: "",
     firstName: "",
     lastName: "",
     email: "",
@@ -60,15 +63,16 @@ export default function ProfilePage() {
       }
       try {
         const data = await getMyProfile(token);
-        const [firstName = "", lastName = ""] = data.data.name.split(" ");
         setUser(data.data);
         setFormData({
-          firstName,
-          lastName,
-          email: data.data.email,
+          userName: data.data.username || "",
+          firstName: data.data.firstname || "",
+          lastName: data.data.lastname || "",
+          email: data.data.email || "",
           telephone: data.data.telephone || "",
-          role: data.data.role,
+          role: data.data.role || "",
         });
+
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -102,11 +106,14 @@ export default function ProfilePage() {
 
     try {
       const updatedUser = await updateMyProfile(token, {
-        name: `${formData.firstName} ${formData.lastName}`,
+        username : formData.userName,
+        firstname: formData.firstName,
+        lastname: formData.lastName,
         email: formData.email,
         telephone: formData.telephone,
         role: formData.role,
       });
+      
 
       if (updatedUser.success) {
         setUser(updatedUser.data);
@@ -123,14 +130,15 @@ export default function ProfilePage() {
   };
 
   const handleCancel = () => {
-    const [firstName = "", lastName = ""] = user.name.split(" ");
     setFormData({
-      firstName,
-      lastName,
+      userName: user.userName || "",
+      firstName: user.firstName || "",
+      lastName: user.lastName || "",
       email: user.email,
       telephone: user.telephone || "",
       role: user.role,
     });
+    
     setIsEditing(false);
   };
 
@@ -201,7 +209,7 @@ export default function ProfilePage() {
       <div className="flex flex-col">
         <div className="flex items-center gap-3">
           <h2 className="text-3xl font-semibold text-green-900">
-            {formData.firstName} {formData.lastName}
+            {formData.userName}
           </h2>
           {formData.role === "admin" && (
             <span className="px-3 py-1 text-sm font-medium text-white rounded bg-green-800">
@@ -334,41 +342,34 @@ export default function ProfilePage() {
           />
         )}
         {showPopup && (
-          <ConfirmationPopup
-            title={popupProps.title}
-            message={popupProps.message}
-            onConfirm={popupProps.onConfirm}
-            onCancel={popupProps.onCancel}
-            confirmColor={popupProps.confirmColor}
-          />
-        )}
-
-        {/* Snackbar for phone validation */}
-     
-        <Snackbar
-          open={showSnackbar}
-          autoHideDuration={6000}
-          onClose={() => setShowSnackbar(false)}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        >
-          <Alert onClose={() => setShowSnackbar(false)} severity="error">
-            กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (เริ่มด้วย 0 และมี 9-10 หลัก)
-          </Alert>
-        </Snackbar>
-
-        <Snackbar
-          open={showNameSnackbar}
-          autoHideDuration={6000}
-          onClose={() => setShowNameSnackbar(false)}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        >
-          <Alert onClose={() => setShowNameSnackbar(false)} severity="error">
-            กรุณากรอกชื่อและนามสกุลให้ครบถ้วน
-          </Alert>
-        </Snackbar>
-
-
-      </div>
-    </div>
-  );
-}
+                    <ConfirmationPopup
+                    title={popupProps.title}
+                    message={popupProps.message}
+                    onConfirm={popupProps.onConfirm}
+                    onCancel={popupProps.onCancel}
+                    confirmColor={popupProps.confirmColor}
+                  />
+                )}
+                <Snackbar
+                  open={showSnackbar}
+                  autoHideDuration={4000}
+                  onClose={() => setShowSnackbar(false)}
+                >
+                  <Alert severity="warning" sx={{ width: "100%" }}>
+                    Phone number must start with 0 and contain 9–10 digits.
+                  </Alert>
+                </Snackbar>
+                <Snackbar
+                  open={showNameSnackbar}
+                  autoHideDuration={4000}
+                  onClose={() => setShowNameSnackbar(false)}
+                >
+                  <Alert severity="warning" sx={{ width: "100%" }}>
+                    First and last name are required.
+                  </Alert>
+                </Snackbar>
+              </div>
+            </div>
+          );
+        }
+        
