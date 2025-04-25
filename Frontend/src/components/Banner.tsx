@@ -39,9 +39,9 @@ export default function Banner() {
 
       {session && (
         <div className="z-30 absolute top-5 right-10 font-semibold text-white text-lg shadow-md px-4 py-2 bg-emerald-700 bg-opacity-80 rounded-lg">
-          Welcome, {session.user?.name || session.user?.email}
+          Welcome, {session.user?.username || session.user?.email}
         </div>
       )}
-    </div>
+    </div> 
   );
 }
