@@ -210,7 +210,17 @@ export default function ProfilePage() {
       <div className="flex flex-col">
         <div className="flex items-center gap-3">
           <h2 className="text-3xl font-semibold text-green-900">
-            {formData.userName}
+          {isEditing ? (
+            <input
+              type="text"
+              name="userName"
+              value={formData.userName}
+              onChange={handleChange}
+              className="border rounded px-3 py-2 mt-1"
+            />
+          ) : (
+            <span className="mt-1">{formData.userName}</span>
+          )}
           </h2>
           {formData.role === "admin" && (
             <span className="px-3 py-1 text-sm font-medium text-white rounded bg-green-800">

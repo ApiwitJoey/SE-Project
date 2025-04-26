@@ -116,38 +116,40 @@ const UserCart = () => {
                     Active Users
                 </h2>
                 <div className="space-y-4">
-                    {normalUser.slice().reverse().map((user:User) => (
+                    {normalUser
+                    .filter((user: User) => user.role !== 'admin')  // <-- ตัด admin ออก
+                    .slice()
+                    .reverse()
+                    .map((user: User) => (
                         <div key={user._id} className="bg-white rounded-lg shadow-md p-4 border border-emerald-100 hover:shadow-lg transition-shadow">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <p className="text-sm text-emerald-600">Name</p>
-                                    <p className="font-medium text-emerald-600">{user.firstname??user.username??user.name}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm text-emerald-600">Email</p>
-                                    <p className="font-medium text-emerald-600">{user.email}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm text-emerald-600">Role</p>
-                                    <p className="font-medium capitalize text-emerald-600">{user.role}</p>
-                                </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                            <p className="text-sm text-emerald-600">Name</p>
+                            <p className="font-medium text-emerald-600">{user.username}</p>
                             </div>
-                            <div className="flex justify-end space-x-3 mt-4">
-                                <button 
-                                    onClick={() => {setUser({name:user.name, id:user._id}); setShowPopup(true);}}
-                                    className="px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors"
-                                >
-                                    Delete
-                                </button>
-                                {user.role !== 'admin' && (
-                                    <button 
-                                        onClick={() => handleBan(user._id)}
-                                        className="px-4 py-2 bg-amber-100 text-amber-700 rounded-md hover:bg-amber-200 transition-colors"
-                                    >
-                                        Ban
-                                    </button>
-                                )}
+                            <div>
+                            <p className="text-sm text-emerald-600">Email</p>
+                            <p className="font-medium text-emerald-600">{user.email}</p>
                             </div>
+                            <div>
+                            <p className="text-sm text-emerald-600">Role</p>
+                            <p className="font-medium capitalize text-emerald-600">{user.role}</p>
+                            </div>
+                        </div>
+                        <div className="flex justify-end space-x-3 mt-4">
+                            <button 
+                            onClick={() => { setUser({ name: user.name, id: user._id }); setShowPopup(true); }}
+                            className="px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors"
+                            >
+                            Delete
+                            </button>
+                            <button 
+                            onClick={() => handleBan(user._id)}
+                            className="px-4 py-2 bg-amber-100 text-amber-700 rounded-md hover:bg-amber-200 transition-colors"
+                            >
+                            Ban
+                            </button>
+                        </div>
                         </div>
                     ))}
                 </div>
