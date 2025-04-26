@@ -39,13 +39,14 @@ export const userSlice = createSlice({
                 }
             })
         },
-        updateUser: (state, action: PayloadAction<{ id: string; name: string; telephone: string;}>) => {
-            const { id, name, telephone } = action.payload;
+        updateUser: (state, action: PayloadAction<User>) => {
+            const { _id, firstname, lastname, telephone } = action.payload;
 
-            const userToUpdate = state.user.find(user => user._id === id);
+            const userToUpdate = state.user.find(user => user._id === _id);
           
             if (userToUpdate) {
-              userToUpdate.name = name;
+              userToUpdate.firstname = firstname;
+              userToUpdate.lastname = lastname;
               userToUpdate.telephone = telephone;
             }
           }

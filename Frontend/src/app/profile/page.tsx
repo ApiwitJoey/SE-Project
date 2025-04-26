@@ -119,6 +119,7 @@ export default function ProfilePage() {
         setUser(updatedUser.data);
         setIsEditing(false);
         setShowSuccessPopup(true);
+        dispatch(updatedUser(updatedUser.data))
       } else {
         console.error("Error updating user data:", updatedUser.message);
       }

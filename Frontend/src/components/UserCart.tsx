@@ -116,12 +116,12 @@ const UserCart = () => {
                     Active Users
                 </h2>
                 <div className="space-y-4">
-                    {normalUser.map((user:User) => (
+                    {normalUser.slice().reverse().map((user:User) => (
                         <div key={user._id} className="bg-white rounded-lg shadow-md p-4 border border-emerald-100 hover:shadow-lg transition-shadow">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <p className="text-sm text-emerald-600">Name</p>
-                                    <p className="font-medium text-emerald-600">{user.name}</p>
+                                    <p className="font-medium text-emerald-600">{user.firstname??user.username??user.name}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-emerald-600">Email</p>
