@@ -37,7 +37,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
     const [loading, setLoading] = useState(true);
 
     if(role != "admin" || !token){
-        router.push('/');
+        router.push('/auth/signin2');
     }
 
     useEffect(() => {
