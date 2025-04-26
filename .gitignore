@@ -1,6 +1,7 @@
 # Backend
 Backend/node_modules/
 Backend/config/config.env
+Backend/coverage
 
 # Frontend
 Frontend/node_modules/
