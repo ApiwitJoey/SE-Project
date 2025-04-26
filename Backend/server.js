@@ -32,6 +32,11 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'A simple Express SABAAI API',
     },
+    servers: [
+      {
+        url: 'http://localhost:5000/api/v1/',
+      },
+    ],
   },
   apis: ['./routes/*.js'], // <-- we'll write documentation inside route files
 };
