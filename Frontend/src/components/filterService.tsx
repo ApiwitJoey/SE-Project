@@ -224,7 +224,7 @@ export default function ServiceFilter() {
                                     value={upperPriceFilter === Infinity ? '' : upperPriceFilter}
                                     onChange={(e) => setUpperPriceFilter(Number(e.target.value))}
                                     placeholder="Max price"
-                                    inputProps={{ min: 0 }}
+                                    inputProps={{ min: 1 }}
                                     variant="outlined"
                                     size="small"
                                     fullWidth

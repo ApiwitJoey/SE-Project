@@ -56,10 +56,10 @@ export default function ServiceList() {
             }
         
             // 3. Filter by price range
-            if (lowerPriceFilter && service.price < lowerPriceFilter) {
+            if (lowerPriceFilter && service.price <= lowerPriceFilter) {
                 return false;
             }
-            if (upperPriceFilter && service.price > upperPriceFilter) {
+            if (upperPriceFilter && service.price >= upperPriceFilter) {
                 return false;
             }
 
