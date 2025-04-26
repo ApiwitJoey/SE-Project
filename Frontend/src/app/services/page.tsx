@@ -1,4 +1,5 @@
 import ServiceList from "@/components/ServiceList"
+import ServiceFilter from "@/components/filterService"
 
 const ServicesPage = () => {
     return (
@@ -10,6 +11,7 @@ const ServicesPage = () => {
                 Choose Your Relaxation Experience
             </p>
             </div>
+            <ServiceFilter/>
 
             <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8 border border-emerald-100">
                 <ServiceList />

@@ -1,7 +1,4 @@
 "use client";
-import { addService, clearServices } from "@/redux/features/serviceSlice";
-import { useAppSelector, AppDispatch } from "@/redux/store";
-import { useDispatch } from "react-redux";
 import { useEffect, useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -9,23 +6,29 @@ import getAllServices from "@/libs/Service/getServices";
 import { Service, ServiceJson } from "../../interfaces";
 import CircularProgress from "@mui/material/CircularProgress";
 import Link from "next/link";
+import Pagination from "@mui/material/Pagination";
+import BodyPart from "./iconTargetArea";
+import MassageType from "./iconMassageType";
 
 export default function ServiceList() {
     const [allServices, setAllServices] = useState<Service[] | null>(null);
-    const dispatch = useDispatch<AppDispatch>();
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 15;
     const { data: session } = useSession();
     const [loading, setLoading] = useState(true);
     const searchParams = useSearchParams();
 
     // Get filter params from URL
+    const nameFilter = searchParams.get('name') || '';
     const targetAreaFilter = searchParams.get('targetArea') || '';
     const massageTypeFilter = searchParams.get('massageType') || '';
     const lowerPriceFilter = Number(searchParams.get('lowerprice')) || 0;
     const upperPriceFilter = Number(searchParams.get('upperprice')) || Infinity;
 
-    // Fetch shops only once when component mounts
+    // Fetch services when search params change
     useEffect(() => {
         const fetchService = async () => {
+            setLoading(true);
             const response: ServiceJson = await getAllServices();
             
             if (response.success) {
@@ -34,7 +37,7 @@ export default function ServiceList() {
             }
         };
         fetchService();
-    }, []);
+    }, [searchParams]); // Add searchParams as dependency
 
     // Apply filters locally using useMemo
     const filteredServices = useMemo(() => {
@@ -58,26 +61,31 @@ export default function ServiceList() {
             if (upperPriceFilter && service.price > upperPriceFilter) {
                 return false;
             }
+
+            // 4. Filter by name
+            if (nameFilter && !service.name.toLowerCase().includes(nameFilter.toLowerCase())) {
+                return false;
+            }
         
             return true;
         });
-    }, [allServices, targetAreaFilter, massageTypeFilter, lowerPriceFilter, upperPriceFilter]);
+    }, [allServices, nameFilter, targetAreaFilter, massageTypeFilter, lowerPriceFilter, upperPriceFilter]);
 
-    // Update Redux store whenever filtered shops change
+    // Reset to first page when filters change
     useEffect(() => {
-        // Always clear the store first
-        dispatch(clearServices());
-        
-        // Then add the filtered shops
-        if (filteredServices.length > 0) {
-            filteredServices.forEach((service: Service) => {
-                dispatch(addService(service));
-            });
-        }
-    }, [filteredServices, dispatch]);
+        setCurrentPage(1);
+    }, [nameFilter, targetAreaFilter, massageTypeFilter, lowerPriceFilter, upperPriceFilter]);
 
-    // Use shopItems from Redux for rendering
-    const serviceItems = useAppSelector((state) => state.service.service);
+    // Calculate pagination
+    const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentServices = filteredServices.slice(startIndex, endIndex);
+
+    // Handle page change
+    const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+        setCurrentPage(value);
+    };
 
     if (loading) {
         return (
@@ -88,103 +96,118 @@ export default function ServiceList() {
     }
 
     return (
-        <>
-            {serviceItems.length === 0 ? (
+        <div className="flex flex-col items-center gap-4">
+            {currentServices.length === 0 ? (
                 <div className="flex items-center justify-center w-full h-[50vh]">
                     <div className="text-center text-2xl text-emerald-700 font-semibold">
                         No Service Available
                     </div>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-4">
-                    {serviceItems.map((serviceItem) => (
-                        <div
-                            className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-emerald-100"
-                            key={serviceItem._id}
-                        >
-                            <div className="p-6">
-                                <div className="text-xl font-bold text-emerald-800 mb-2">
-                                    {serviceItem.name}
-                                </div>
-                                <div className="space-y-2 text-emerald-700">
-                                    <div className="flex items-start">
-                                        <svg
-                                            className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
-                                            />
-                                        </svg>
-                                        <Link href={`/shops/${serviceItem.shop?._id}`}>
-                                            <span className="hover:text-emerald-600 hover:underline transition-all duration-200">
-                                                {serviceItem.shop?.name || 'No Shop'}
-                                            </span>
-                                        </Link>
+                <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-4 w-full max-w-7xl mx-auto">
+                        {currentServices.map((serviceItem) => (
+                            <div
+                                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-emerald-100 h-[280px] flex flex-col"
+                                key={serviceItem._id}
+                            >
+                                <div className="p-6">
+                                    <div className="text-xl font-bold text-emerald-800 mb-4 line-clamp-1">
+                                        {serviceItem.name}
                                     </div>
-                                    <div className="flex items-start">
-                                        <svg
-                                            className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                                            />
-                                        </svg>
-                                        <span>Target Area: {serviceItem.targetArea}</span>
+                                    <div className="space-y-3 text-emerald-700 flex-grow">
+                                        <div className="flex items-start">
+                                            <svg
+                                                className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                                                />
+                                            </svg>
+                                            <Link href={`/shops/${serviceItem.shop?._id}`} className="line-clamp-1">
+                                                <span className="hover:text-emerald-600 hover:underline transition-all duration-200">
+                                                    {serviceItem.shop?.name || 'No Shop'}
+                                                </span>
+                                            </Link>
+                                        </div>
+                                        <div className="flex items-start">
+                                            <svg
+                                                className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                />
+                                            </svg>
+                                            <span className="font-semibold"> {serviceItem.price.toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex flex-wrap items-start gap-2">
+                                            <BodyPart name={serviceItem.targetArea} />
+                                            <MassageType name={serviceItem.massageType} />
+                                        </div>
                                     </div>
-                                    <div className="flex items-start">
-                                        <svg
-                                            className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                                            />
-                                        </svg>
-                                        <span>Massage Type: {serviceItem.massageType}</span>
-                                    </div>
-                                    <div className="flex items-start">
-                                        <svg
-                                            className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                            />
-                                        </svg>
-                                        <span>฿{serviceItem.price}</span>
-                                    </div>
+                                    { serviceItem.shop?._id ? 
+                                    <div className="p-6 pt-0 mt-auto">
+                                        <div className="mt-4 flex justify-center">
+                                            <Link 
+                                                href={`/booking?shopId=${serviceItem.shop._id}`}
+                                                className="inline-flex items-center justify-center px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors duration-200 w-1/2 text-center"
+                                            >
+                                                <svg
+                                                    className="w-5 h-5 mr-2"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                                                    />
+                                                </svg>
+                                                Book Now
+                                            </Link>
+                                        </div>
+                                    </div> 
+                                    : null}
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                    {totalPages > 1 && (
+                        <Pagination 
+                            count={totalPages} 
+                            page={currentPage} 
+                            onChange={handlePageChange}
+                            color="primary"
+                            sx={{
+                                '& .MuiPaginationItem-root': {
+                                    color: '#10b981',
+                                },
+                                '& .Mui-selected': {
+                                    backgroundColor: '#10b981 !important',
+                                    color: 'white !important',
+                                },
+                            }}
+                        />
+                    )}
+                </>
             )}
-        </>
+        </div>
     );
 }
