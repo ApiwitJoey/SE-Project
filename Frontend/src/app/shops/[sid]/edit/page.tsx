@@ -304,6 +304,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                 <SuccessPopup
                     message="Service deleted successfully!"
                     onClose={() => setShowDeleteSuccessPopup(false)} // Close the success popup
+                    confirmColor="red"
                 />
             )}
         </div>
