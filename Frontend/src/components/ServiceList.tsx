@@ -117,11 +117,12 @@ export default function ServiceList() {
                 <>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-4 w-full max-w-7xl mx-auto">
                         {currentServices.map((serviceItem) => (
+                            serviceItem.shop?._id ?
                             <div
-                                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-emerald-100 h-[320px] flex flex-col"
+                                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-emerald-100 flex flex-col"
                                 key={serviceItem._id}
                             >
-                                <div className="p-6">
+                                <div className="p-6 flex flex-col flex-grow">
                                     <div className="text-xl font-bold text-emerald-800 mb-4 line-clamp-1">
                                         {serviceItem.name}
                                     </div>
@@ -174,34 +175,30 @@ export default function ServiceList() {
                                             <MassageType name={serviceItem.massageType} />
                                         </div>
                                     </div>
-                                    { serviceItem.shop?._id ? 
-                                    <div className="p-6 pt-0 mt-auto">
-                                        <div className="mt-4 flex justify-center">
-                                            <Link 
-                                                href={`/booking?shopId=${serviceItem.shop._id}&serviceId=${serviceItem._id}`}
-                                                className="inline-flex items-center justify-center px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors duration-200 w-1/2 text-center"
+                                    <div className="mt-4 flex justify-center">
+                                        <Link 
+                                            href={`/booking?shopId=${serviceItem.shop._id}&serviceId=${serviceItem._id}`}
+                                            className="inline-flex items-center justify-center px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors duration-200 w-1/2 text-center"
+                                        >
+                                            <svg
+                                                className="w-5 h-5 mr-2"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg"
                                             >
-                                                <svg
-                                                    className="w-5 h-5 mr-2"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                                                    />
-                                                </svg>
-                                                Book Now
-                                            </Link>
-                                        </div>
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                                                />
+                                            </svg>
+                                            Book Now
+                                        </Link>
                                     </div> 
-                                    : null}
                                 </div>
-                            </div>
+                            </div> : null
                         ))}
                     </div>
                     {totalPages > 1 && (
