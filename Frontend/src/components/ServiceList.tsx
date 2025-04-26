@@ -24,6 +24,7 @@ export default function ServiceList() {
     const massageTypeFilter = searchParams.get('massageType') || '';
     const lowerPriceFilter = Number(searchParams.get('lowerprice')) || 0;
     const upperPriceFilter = Number(searchParams.get('upperprice')) || Infinity;
+    const sortBy = searchParams.get('sortBy') || '';
 
     // Fetch services when search params change
     useEffect(() => {
@@ -43,7 +44,7 @@ export default function ServiceList() {
     const filteredServices = useMemo(() => {
         if (!allServices) return [];
 
-        return allServices.filter(service => {
+        let filtered = allServices.filter(service => {
             // 1. Filter by target area
             if (targetAreaFilter && service.targetArea !== targetAreaFilter) {
                 return false;
@@ -69,12 +70,21 @@ export default function ServiceList() {
         
             return true;
         });
-    }, [allServices, nameFilter, targetAreaFilter, massageTypeFilter, lowerPriceFilter, upperPriceFilter]);
+
+        // Sort by price if sortBy is specified
+        if (sortBy === 'asc') {
+            filtered.sort((a, b) => a.price - b.price); // Low to High
+        } else if (sortBy === 'desc') {
+            filtered.sort((a, b) => b.price - a.price); // High to Low
+        }
+
+        return filtered;
+    }, [allServices, nameFilter, targetAreaFilter, massageTypeFilter, lowerPriceFilter, upperPriceFilter, sortBy]);
 
     // Reset to first page when filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [nameFilter, targetAreaFilter, massageTypeFilter, lowerPriceFilter, upperPriceFilter]);
+    }, [nameFilter, targetAreaFilter, massageTypeFilter, lowerPriceFilter, upperPriceFilter, sortBy]);
 
     // Calculate pagination
     const totalPages = Math.ceil(filteredServices.length / itemsPerPage);

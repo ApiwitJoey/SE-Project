@@ -51,8 +51,51 @@ const theme = createTheme({
                 },
             },
         },
+        MuiTextField: {
+            styleOverrides: {
+                root: {
+                    '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                            borderColor: '#059669', // emerald-600
+                        },
+                        '&:hover fieldset': {
+                            borderColor: '#047857', // emerald-700
+                        },
+                        '&.Mui-focused fieldset': {
+                            borderColor: '#047857', // emerald-700
+                        },
+                    },
+                    '& .MuiInputBase-input': {
+                        backgroundColor: '#F7F7F7', // light gray
+                    },
+                },
+            },
+        },
+        MuiSelect: {
+            styleOverrides: {
+                root: {
+                    '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                            borderColor: '#059669', // emerald-600
+                        },
+                        '&:hover fieldset': {
+                            borderColor: '#047857', // emerald-700
+                        },
+                        '&.Mui-focused fieldset': {
+                            borderColor: '#047857', // emerald-700
+                            boxShadow: '0 0 0 0.2rem rgba(5, 150, 105, 0.25)', // emerald-600 with 25% opacity
+                        },
+                    },
+                    '& .MuiInputBase-input': {
+                        backgroundColor: '#F7F7F7', // light gray
+                    },
+                },
+            },
+        },
     },
 });
+
+
 
 export default function ServiceFilter() {
     const router = useRouter();
@@ -64,6 +107,7 @@ export default function ServiceFilter() {
     const [massageTypeFilter, setMassageTypeFilter] = useState(searchParams.get('massageType') || '');
     const [lowerPriceFilter, setLowerPriceFilter] = useState(Number(searchParams.get('lowerprice')) || 0);
     const [upperPriceFilter, setUpperPriceFilter] = useState(searchParams.get('upperprice') ? Number(searchParams.get('upperprice')) : Infinity);
+    const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || '');
 
     const targetArea = [
         'Head & Shoulder', 
@@ -110,6 +154,9 @@ export default function ServiceFilter() {
 
         // Only append upperPriceFilter if it's not Infinity
         if (upperPriceFilter !== Infinity) params.append('upperprice', String(upperPriceFilter));
+
+        // Sort
+        if (sortBy) params.append('sortBy', sortBy);
         
         // Redirect to the same page with filters
         router.push(`/services?${params.toString()}`);
@@ -121,6 +168,7 @@ export default function ServiceFilter() {
         setMassageTypeFilter('');
         setLowerPriceFilter(0);
         setUpperPriceFilter(Infinity);
+        setSortBy('');
         router.push('/services');
     };
     
@@ -265,6 +313,44 @@ export default function ServiceFilter() {
                                     {targetArea.map((area) => (
                                         <MenuItem key={area} value={area}>{area}</MenuItem>
                                     ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+
+                        {/* Sort By Filter */}
+                        <Grid item xs={12} md={3}>
+                            <FormControl fullWidth size="small">
+                                <InputLabel>Sort By</InputLabel>
+                                <Select
+                                    value={sortBy}
+                                    label="Sort By"
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    sx={{
+                                        '& .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: 'primary',
+                                        },
+                                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: 'primary.main',
+                                        },
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: 'primary.main',
+                                        },
+                                        '& .MuiOutlinedInput-root': {
+                                            '& fieldset': {
+                                                borderColor: 'primary.light',
+                                            },
+                                            '&:hover fieldset': {
+                                                borderColor: 'primary.main',
+                                            },
+                                            '&.Mui-focused fieldset': {
+                                                borderColor: 'primary.main',
+                                            },
+                                        },
+                                    }}
+                                >
+                                    <MenuItem value="">None</MenuItem>
+                                    <MenuItem value="asc">Price: Low to High</MenuItem>
+                                    <MenuItem value="desc">Price: High to Low</MenuItem>
                                 </Select>
                             </FormControl>
                         </Grid>
