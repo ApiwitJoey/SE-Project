@@ -17,6 +17,9 @@ export interface User {
     isBan: boolean,
     _id: string,
     name: string,
+    username: string,
+    firstname: string,
+    lastname: string,
     email: string,
     role: string,
     telephone: string
