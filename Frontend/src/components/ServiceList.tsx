@@ -118,7 +118,7 @@ export default function ServiceList() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-4 w-full max-w-7xl mx-auto">
                         {currentServices.map((serviceItem) => (
                             <div
-                                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-emerald-100 h-[280px] flex flex-col"
+                                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-emerald-100 h-[320px] flex flex-col"
                                 key={serviceItem._id}
                             >
                                 <div className="p-6">
@@ -164,6 +164,11 @@ export default function ServiceList() {
                                             </svg>
                                             <span className="font-semibold"> {serviceItem.price.toLocaleString()}</span>
                                         </div>
+                                        <div className="flex items-start">
+                                                <span>
+                                                    {serviceItem.details}
+                                                </span>
+                                        </div>
                                         <div className="flex flex-wrap items-start gap-2">
                                             <BodyPart name={serviceItem.targetArea} />
                                             <MassageType name={serviceItem.massageType} />
@@ -173,7 +178,7 @@ export default function ServiceList() {
                                     <div className="p-6 pt-0 mt-auto">
                                         <div className="mt-4 flex justify-center">
                                             <Link 
-                                                href={`/booking?shopId=${serviceItem.shop._id}`}
+                                                href={`/booking?shopId=${serviceItem.shop._id}&serviceId=${serviceItem._id}`}
                                                 className="inline-flex items-center justify-center px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors duration-200 w-1/2 text-center"
                                             >
                                                 <svg

@@ -16,6 +16,7 @@ const BookingPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const defaultShopId = searchParams.get("shopId") || null;
+  const defaultServiceId = searchParams.get("serviceId") || null;
   const dispatch = useDispatch<AppDispatch>();
 
   const handleSubmit = async (date:string, selectedShopId:string, selectedServiceId: string) => {
@@ -64,7 +65,7 @@ const BookingPage = () => {
         )}
         
         <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8 border border-emerald-100">
-          <BookingForm onSubmit={handleSubmit} defaultShopId={defaultShopId}/>
+          <BookingForm onSubmit={handleSubmit} defaultShopId={defaultShopId} defaultServiceId={defaultServiceId}/>
         </div>
       </div>
     </div>

@@ -12,11 +12,11 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { useSession } from "next-auth/react";
 import { DateTimePicker } from "@mui/x-date-pickers";
 
-const BookingForm = ({ onSubmit, defaultShopId, defaultDate }: { onSubmit: Function, defaultShopId?: string | null, defaultDate?: string | null }) => {
+const BookingForm = ({ onSubmit, defaultShopId, defaultServiceId, defaultDate }: { onSubmit: Function, defaultShopId?: string | null, defaultServiceId?: string | null, defaultDate?: string | null }) => {
 
     const [shops, setShops] = useState<Shop[] | null>(null);
     const [services, setServices] = useState<Service[] | null>(null);
-    const [serviceId, setServiceId] = useState<string | null>(null);
+    const [serviceId, setServiceId] = useState<string | null>(defaultServiceId || null);
     const [selectedShopId, setSelectedShopId] = useState<string | null>(defaultShopId || null);
     const [date, setDate] = useState<Dayjs | null>(null);
 
@@ -30,7 +30,7 @@ const BookingForm = ({ onSubmit, defaultShopId, defaultDate }: { onSubmit: Funct
             const response: ServiceJson = ShopId ? await getAllServicesFromShop(ShopId,token) : await getAllServicesFromShop(selectedShopId,token);
             if (response.success && response.data.length > 0) {
                 setServices(response.data);
-                setServiceId(response.data[0]._id)
+                setServiceId(!defaultServiceId ? response.data[0]._id : defaultServiceId)
                 setLoading(false);
             }
             if(response.data.length == 0){
@@ -132,7 +132,7 @@ const BookingForm = ({ onSubmit, defaultShopId, defaultDate }: { onSubmit: Funct
                             labelId="shop-select-label"
                             id="shop-select"
                             value={serviceId}
-                            onChange={(e) => setServiceId(e.target.value as string)}
+                            onChange={(e) => setServiceId(e.target.value)}
                             className="w-full bg-white text-emerald-900 rounded-lg"
                             sx={{
                                 '& .MuiOutlinedInput-notchedOutline': {
