@@ -231,7 +231,8 @@ exports.deleteShop = async (req, res, next) => {
         message: `Shop not found with id of ${req.params.id}`,
       });
     }
-    await Reservation.deleteMany({shop: shop.id})
+    await Reservation.deleteMany({shop: shop.id});
+    await Service.deleteMany({shop : shop.id});
     await Shop.findByIdAndDelete(req.params.id);
     res.status(200).json({ success: true, message: "Delete shop", data: {} });
   } catch (err) {
