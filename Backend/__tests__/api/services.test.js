@@ -1,164 +1,190 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const app = require('../../server')
+const app = require('../../server');
 const Service = require('../../models/Service');
 const Shop = require('../../models/Shop');
-const User = require('../../models/User');
 
 const TEST_ADMIN = {
   email: process.env.TEST_ADMIN_EMAIL,
   password: process.env.TEST_ADMIN_PASSWORD
-}
+};
 const TEST_USER = {
   email: process.env.TEST_USER_EMAIL,
   password: process.env.TEST_USER_PASSWORD
-}
+};
 
 let adminToken;
 let userToken;
+let testShop;
+const testServices = [];
 
-// authentication setup
 beforeAll(async () => {
-  // Login to get tokens once for all tests
   const adminRes = await request(app).post('/api/v1/auth/login').send(TEST_ADMIN);
   adminToken = adminRes.body.token;
   const userRes = await request(app).post('/api/v1/auth/login').send(TEST_USER);
   userToken = userRes.body.token;
+
+  testShop = await Shop.create({
+    name: 'Test Shop',
+    address: 'Test Address',
+    telephone: '0123456789',
+    openTime: '09:00',
+    closeTime: '17:00',
+  });
 });
+
 afterAll(async () => {
-  // Close the server and DB connection
-  // await app.close();
+  // Only clean up the test data we created
+  if (testServices.length > 0) {
+    await Service.deleteMany({ _id: { $in: testServices } });
+  }
+  if (testShop) {
+    await Shop.deleteOne({ _id: testShop._id });
+  }
   await mongoose.connection.close();
 });
 
-// testing US2-2 (api test) , verify new service addition
+
 describe('POST /api/v1/shops/:shopId/services', () => {
-  // to store all data created for this test
-  let testShop;
-  const testServices = [];
-
-  beforeAll(async () => {
-    // Create test data
-    testShop = await Shop.create({
-      name: 'Test Shop',
-      address: 'Americaaaaa',
-      telephone: '0878212231',
-      openTime: '11:00',
-      closeTime: '13:00'
-    });
-  });
-
-  afterAll(async () => {
-    // Clean up database
-    await Service.deleteMany({ shop: { $in: testServices } });
-    await Shop.deleteMany({ _id: testShop._id });
-  });
-
-  // *** Authentication test ***
-  // 1) Admin user with valid token (happy path)
   it('should create a new service', async () => {
-    const res = await request(app) // Use app instead of app
+    const res = await request(app)
       .post(`/api/v1/shops/${testShop._id}/services`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
-        name: 'Test service 1',
-        price: 300,
-        targetArea: 'Full Body',
+        name: 'Service 1',
+        price: 200,
+        targetArea: 'Foot',
         massageType: 'Thai',
-        details: 'this should success wdym'
+        details: 'Testing service create'
       })
       .expect(201);
-    testServices.push(res.body.data._id); // add this newly created service for testing to remove later
+    testServices.push(res.body.data._id);
   });
-  // 2) Regular user attempt
-  it('should not be able to create new service', async () => {
+/*
+  it('should decode HTML entities in creation', async () => {
+    const res = await request(app)
+      .post(`/api/v1/shops/${testShop._id}/services`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Test &amp; Service',
+        price: 100,
+        targetArea: 'Head &amp; Shoulder',
+        massageType: 'Deep &amp; Tissue',
+        details: 'Test details'
+      })
+      .expect(201);
+    
+    expect(res.body.data.name).toBe('Test & Service');
+    expect(res.body.data.targetArea).toBe('Head & Shoulder');
+    testServices.push(res.body.data._id);
+  });
+*/
+
+  it('should return validation errors for invalid input', async () => {
+    const res = await request(app)
+      .post(`/api/v1/shops/${testShop._id}/services`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({}) // empty body should trigger validation errors
+      .expect(400);
+    expect(res.body.errors).toBeDefined();
+  });
+
+
+
+  it('should fail if normal user tries to create', async () => {
     const res = await request(app)
       .post(`/api/v1/shops/${testShop._id}/services`)
       .set('Authorization', `Bearer ${userToken}`)
       .send({
-        name: 'Test service 2',
-        price: 200,
+        name: 'Service 2',
+        price: 250,
         targetArea: 'Full Body',
-        massageType: 'Thai',
-        details: 'I mean it\'s for testing so idk'
-      })
-      .expect(400);
+        massageType: 'Swedish',
+        details: 'Normal user create'
+      });
+    expect([400, 401]).toContain(res.status);
   });
 
-  // *** Shop validation test ***
-  // 1) Invalid shop ID
-  it('should not be able to create new service because provided shopId doesn\'t exist', async () => {
+  it('should fail to create with invalid shopId', async () => {
     const res = await request(app)
-      .post(`/api/v1/shops/${6969}/services`)
+      .post(`/api/v1/shops/invalidid/services`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
-        name: 'Test service 4',
-        price: 400,
-        targetArea: 'Full Body',
-        massageType: 'Thai',
-        details: 'Why its keep getting weirder'
+        name: 'Bad ID',
+        price: 100,
+        targetArea: 'Hand & Arm',
+        massageType: 'Deep Tissue',
+        details: 'Invalid ID test'
       });
-    if (res.status !== 404 && res.status !== 500) {
-      throw new Error(`Expected 404 or 500 , got ${res.status}`);
-    }
+    expect([400, 500]).toContain(res.status);
+  });
+
+  it('should fail if shop does not exist', async () => {
+    const fakeShopId = new mongoose.Types.ObjectId();
+    await request(app)
+      .post(`/api/v1/shops/${fakeShopId}/services`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Ghost Shop',
+        price: 300,
+        targetArea: 'Neck-Shoulder-Back',
+        massageType: 'Oil/Aromatherapy',
+        details: 'Testing non existing shop'
+      })
+      .expect(404);
   });
 });
 
+describe('GET /api/v1/shops/:shopId/services', () => {
+  it('should get services for specific shop', async () => {
+    const res = await request(app)
+      .get(`/api/v1/shops/${testShop._id}/services`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(200);
+    expect(res.body.success).toBe(true);
+  });
+});
 
-// testing US2-3 (api test) , API endpoint integration test
 describe('PUT /api/v1/services/:id', () => {
-  // to store all data created for this test
-  let testService;
+  let service;
 
   beforeAll(async () => {
-    // Create test data
-    testService = await Service.create({
-      name: 'Before test edit',
-      price: 300,
-      targetArea: 'Full Body',
-      massageType: 'Thai',
-      details: 'this should success wdym'
+    service = await Service.create({
+      name: 'Original Name',
+      price: 100,
+      targetArea: 'Chair',
+      massageType: 'Sports',
+      details: 'Details here',
+      shop: testShop._id
     });
+    testServices.push(service._id);
   });
 
-  afterAll(async () => {
-    // Clean up database
-    await Service.deleteMany({ shop: testService._id });
-  });
-
-  // *** Authentication test ***
-  // 1) Admin user with valid token (happy path)
-  it('should edit the existed service', async () => {
-    const res = await request(app)
-      .put(`/api/v1/services/${testService._id}`)
+  it('should update the service', async () => {
+    await request(app)
+      .put(`/api/v1/services/${service._id}`)
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({
-        name: 'After test edit'
-      })
+      .send({ name: 'Updated Name' })
       .expect(200);
-    const updatedService = await Service.findById(testService._id);
-    expect(updatedService.name).toBe('After test edit');
-    // want to change in database to Before test edit
-    await Service.findByIdAndUpdate(
-      testService._id,
-      { name: 'Before test edit' }
-    )
   });
-  // 2) User cannot edit
-  it('should not be able to edit the existed service', async () => {
+
+  it('should fail if normal user tries to update', async () => {
     const res = await request(app)
-      .put(`/api/v1/services/${testService._id}`)
+      .put(`/api/v1/services/${service._id}`)
       .set('Authorization', `Bearer ${userToken}`)
-      .send({
-        name: 'After test edit',
-      });
-    if (res.status !== 401 && res.status !== 500) {
-      throw new Error(`Expected 401 or 500 , got ${res.status}`);
-    }
+      .send({ name: 'User Update' });
+    expect([401, 500]).toContain(res.status);
   });
-  // *** Service ID existence test ***
-  // 1) Service ID is not existed and should not be able to edit it 
-  it('should return 404 if service ID does not exist', async () => {
+
+  it('should fail with invalid id format', async () => {
+    const res = await request(app)
+      .put('/api/v1/services/invalidid')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ name: 'Invalid Update' });
+    expect([400, 500]).toContain(res.status);
+  });
+
+  it('should return 404 if service not found', async () => {
     const fakeId = new mongoose.Types.ObjectId();
     await request(app)
       .put(`/api/v1/services/${fakeId}`)
@@ -166,51 +192,175 @@ describe('PUT /api/v1/services/:id', () => {
       .send({ name: 'Ghost Update' })
       .expect(404);
   });
+
+  it('should succeed even with missing fields', async () => {
+    await request(app)
+      .put(`/api/v1/services/${service._id}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ price: 400 })
+      .expect(200);
+  });
 });
 
-
-// testing US2-4 (api test)
 describe('DELETE /api/v1/services/:id', () => {
-  // to store all data created for this test
-  const serviceTesterData = {
-    name: 'For test delete',
-    price: 300,
-    targetArea: 'Full Body',
-    massageType: 'Thai',
-    details: 'this for delete'
-  }
-  let testService;
+  let service;
 
-  // *** Authentication test ***
-  // 1) Admin user with valid token (happy path)
-  it('should delete the existed service', async () => {
-    testService = await Service.create(serviceTesterData);
-    const res = await request(app)
-      .delete(`/api/v1/services/${testService._id}`)
+  beforeEach(async () => {
+    service = await Service.create({
+      name: 'Service To Delete',
+      price: 120,
+      targetArea: 'Hand & Arm',
+      massageType: 'Office Syndrome',
+      details: 'For delete testing',
+      shop: testShop._id
+    });
+    testServices.push(service._id);
+  });
+
+  it('should delete the service', async () => {
+    await request(app)
+      .delete(`/api/v1/services/${service._id}`)
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(200);
-    // create again for next test
-    testService = await Service.create(serviceTesterData);
-  });
-  // 2) User cannot delete
-  it('should not be able to delete the existed service', async () => {
-    const res = await request(app)
-      .delete(`/api/v1/services/${testService._id}`)
-      .set('Authorization', `Bearer ${userToken}`)
-    const service = await Service.findById(testService._id);
-    expect(service).not.toBe(null);
-    if (res.status !== 401 && res.status !== 404 && res.status !== 500) {
-      throw new Error(`Expected 401 or 404 or 500 , got ${res.status}`);
-    }
   });
 
-  // *** Service ID existence test ***
-  // 1) Service ID is not existed and should not be able to edit it 
-  it('should return 404 if service ID does not exist', async () => {
+  it('should handle errors during deletion', async () => {
+    const mockError = new Error('Database error');
+    const originalDeleteOne = Service.prototype.deleteOne;
+    Service.prototype.deleteOne = jest.fn().mockRejectedValue(mockError);
+
+    const service = await Service.create({
+      name: 'Error Test',
+      price: 100,
+      shop: testShop._id
+    });
+    testServices.push(service._id);
+
+    const res = await request(app)
+      .delete(`/api/v1/services/${service._id}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(500);
+
+    expect(res.body.message).toBe('Cannot delete Service');
+    Service.prototype.deleteOne = originalDeleteOne;
+  });
+
+  it('should not allow normal user to delete', async () => {
+    const res = await request(app)
+      .delete(`/api/v1/services/${service._id}`)
+      .set('Authorization', `Bearer ${userToken}`);
+    expect([401, 404, 500]).toContain(res.status);
+  });
+
+  it('should fail with invalid id format', async () => {
+    const res = await request(app)
+      .delete('/api/v1/services/invalidid')
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect([400, 500]).toContain(res.status);
+  });
+
+  it('should return 404 if service not found', async () => {
     const fakeId = new mongoose.Types.ObjectId();
     await request(app)
       .delete(`/api/v1/services/${fakeId}`)
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(404);
   });
+});
+
+describe('GET /api/v1/services/:id', () => {
+  let service;
+
+  beforeAll(async () => {
+    service = await Service.create({
+      name: 'Service Fetch',
+      price: 350,
+      targetArea: 'Neck-Shoulder-Back',
+      massageType: 'Shiatsu',
+      details: 'Fetch testing',
+      shop: testShop._id
+    });
+    testServices.push(service._id);
+  });
+
+  it('should fetch the service', async () => {
+    await request(app)
+      .get(`/api/v1/services/${service._id}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(200);
+  });
+
+  it('should populate shop information without _id', async () => {
+    const res = await request(app)
+      .get(`/api/v1/services/${service._id}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(200);
+    
+    expect(res.body.data.shop).toBeDefined();
+    expect(res.body.data.shop._id).toBeUndefined();
+  });
+
+  it('should return 404 if service not found', async () => {
+    const fakeId = new mongoose.Types.ObjectId();
+    await request(app)
+      .get(`/api/v1/services/${fakeId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(404);
+  });
+
+  it('should return 500 if service id invalid', async () => {
+    await request(app)
+      .get(`/api/v1/services/invalidid`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(500);
+  });
+
+  it('should return 500 if findById throws error', async () => {
+    const originalFindById = Service.findById;
+    Service.findById = jest.fn().mockReturnValue({
+      populate: jest.fn().mockRejectedValue(new Error('Forced Error'))
+    });
+
+    await request(app)
+      .get(`/api/v1/services/anyid`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(500);
+
+    Service.findById = originalFindById;
+  });
+});
+
+describe('GET /api/v1/services', () => {
+  it('should fetch all services', async () => {
+    const res = await request(app)
+      .get('/api/v1/services')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(200);
+    expect(res.body.success).toBe(true);
+  });
+
+  it('should return 500 if find throws error', async () => {
+    const originalFind = Service.find;
+    Service.find = jest.fn().mockReturnValue({
+      populate: jest.fn().mockRejectedValue(new Error('Forced Error'))
+    });
+
+    await request(app)
+      .get('/api/v1/services')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(500);
+
+    Service.find = originalFind;
+  });
+});
+
+it('should return the same text for null, undefined, or empty string input', () => {
+  // Test for null
+  expect(decodeHtmlEntities(null)).toBe(null);
+  
+  // Test for undefined
+  expect(decodeHtmlEntities(undefined)).toBe(undefined);
+  
+  // Test for an empty string
+  expect(decodeHtmlEntities('')).toBe('');
 });

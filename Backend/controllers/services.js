@@ -1,9 +1,9 @@
 const Shop = require("../models/Shop");
 const Service = require("../models/Service");
-const { validationResult } = require("express-validator");
+const { validationResult, body } = require("express-validator");
 
 // Helper function to decode HTML entities
-const decodeHtmlEntities = (text) => {
+decodeHtmlEntities = (text) => {
     if (!text) return text;
     return text.replace(/&amp;/g, '&')
 };
@@ -78,59 +78,59 @@ exports.getServices = async (req, res, next) => {
 // @route POST /api/v1/services/
 // @access Private
 // note : this always get call in context of a shop
-exports.createService = async (req, res, next) => {
-    try {
-        // Check for validation errors
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({
-                success: false,
-                errors: errors.array()
-            });
-        }
+exports.createService = [
+    // Validation rules
+    body('name').notEmpty().withMessage('Name is required'),
+    body('targetArea').notEmpty().withMessage('Target area is required'),
+    body('massageType').notEmpty().withMessage('Massage type is required'),
+    body('details').notEmpty().withMessage('Details are required'),
 
-        req.body.shop = req.params.shopId;
-        const shop = await Shop.findById(req.params.shopId);
-        if (!shop) {
-            return res.status(404).json({
-                success: false,
-                message: `No shop with the id of${req.params.shopId}`,
-            });
-        }
-        // if shop exist
-        if (req.user.role !== 'admin') {
-            return res.status(400).json({
-                success: false,
-                message: `Only admin can create more service`,
-            })
-        }
+    // Validation error handling
+    async (req, res, next) => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({
+                    success: false,
+                    errors: errors.array()
+                });
+            }
 
-        // Decode HTML entities in the request body
-        const decodedBody = {
-            ...req.body,
-            name: decodeHtmlEntities(req.body.name),
-            targetArea: decodeHtmlEntities(req.body.targetArea),
-            massageType: decodeHtmlEntities(req.body.massageType),
-            details: decodeHtmlEntities(req.body.details)
-        };
-        console.log(decodedBody)
+            req.body.shop = req.params.shopId;
+            const shop = await Shop.findById(req.params.shopId);
+            if (!shop) {
+                return res.status(404).json({
+                    success: false,
+                    message: `No shop with the id of ${req.params.shopId}`,
+                });
+            }
 
-        const service = await Service.create(decodedBody);
-        const populatedService = await service.populate('shop');
-        res.status(201).json({ success: true, data: populatedService });
-    } catch (err) {
-        console.log(err.stack);
-        if (err.name === 'ValidationError') {
-            return res.status(400).json({
-                success: false,
-                message: Object.values(err.errors).map(val => val.message)
-            });
+            if (req.user.role !== 'admin') {
+                return res.status(400).json({
+                    success: false,
+                    message: `Only admin can create more service`,
+                });
+            }
+
+            // Decode HTML entities in the request body
+            const decodedBody = {
+                ...req.body,
+                name: decodeHtmlEntities(req.body.name),
+                targetArea: decodeHtmlEntities(req.body.targetArea),
+                massageType: decodeHtmlEntities(req.body.massageType),
+                details: decodeHtmlEntities(req.body.details)
+            };
+            console.log(decodedBody);
+
+            const service = await Service.create(decodedBody);
+            const populatedService = await service.populate('shop');
+            res.status(201).json({ success: true, data: populatedService });
+        } catch (err) {
+            console.log(err.stack);
+            return res.status(500).json({ success: false, message: "Cannot create Service" });
         }
-        return res
-            .status(500)
-            .json({ success: false, message: "Cannot create Service" });
     }
-};
+];
 
 // @desc Update service
 // @route PUT /api/v1/services/:id
@@ -181,15 +181,15 @@ exports.updateService = async (req, res, next) => {
 exports.deleteService = async (req, res, next) => {
     try {
         const service = await Service.findById(req.params.id);
-        if(!service) {
+        if (!service) {
             return res.status(404).json({
                 success: false,
                 message: `No service with the id of ${req.params.id}`,
             });
         }
-        if(req.user.role !== 'admin') {
+        if (req.user.role !== 'admin') {
             return res.status(401).json({
-                success:false,
+                success: false,
                 message: 'Only admin can delete service'
             })
         }
@@ -197,7 +197,7 @@ exports.deleteService = async (req, res, next) => {
         res.status(200).json({
             success: true, data: {},
         })
-    } catch(err) {
-        res.status(500).json({success: false , message: 'Cannot delete Service'});
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Cannot delete Service' });
     }
 };
