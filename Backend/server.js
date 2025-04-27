@@ -8,6 +8,8 @@ const { xss } = require("express-xss-sanitizer");
 const rateLimit = require("express-rate-limit");
 const hpp = require("hpp");
 const cors = require("cors");
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 dotenv.config({ path: "./config/config.env" });
 
@@ -21,6 +23,26 @@ const users = require("./routes/users");
 const services = require("./routes/services");
 
 const app = express();
+
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Library API',
+      version: '1.0.0',
+      description: 'A simple Express SABAAI API',
+    },
+    servers: [
+      {
+        url: 'http://localhost:5000/api/v1/',
+      },
+    ],
+  },
+  apis: ['./routes/*.js'], // <-- we'll write documentation inside route files
+};
+
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 app.use(express.json()); // Body parser
 app.use(cookieParser()); // Cookie parser
@@ -42,6 +64,7 @@ app.use("/api/v1/reservations", reservations);
 app.use("/api/v1/users", users);
 // US2-4
 app.use("/api/v1/services" , services);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const PORT = process.env.PORT || 5000;
 const server = app.listen(
