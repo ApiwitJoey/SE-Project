@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test('test', async ({ page }) => {
     test.setTimeout(60000);
-  await page.goto('http://localhost:3000/');
+  await page.goto('https://sabaai.vercel.app/');
   await page.waitForTimeout(2000);
   await page.getByRole('link', { name: 'Sign In' }).click();
   await page.getByRole('textbox', { name: 'Email Address' }).click();
