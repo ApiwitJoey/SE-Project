@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('test', async ({ page }) => {
+test('US2_4 Invalid', async ({ page }) => {
     await page.goto('https://sabaai.vercel.app/');
     await page.goto('https://sabaai.vercel.app/shops/680cf822f76c7d46afafd208/edit');
     await page.waitForTimeout(750);

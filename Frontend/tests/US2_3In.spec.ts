@@ -1,36 +1,49 @@
 import { test, expect } from '@playwright/test';
+import dotenv from 'dotenv';
 
-test('test', async ({ page }) => {
+dotenv.config({ path: './.env.local' });
+
+test('US2_3 Invalid', async ({ page }) => {
+    const adminEmail = process.env.TEST_ADMIN_EMAIL
+    const adminPassword = process.env.TEST_ADMIN_PASSWORD
+    
+    if (!adminEmail || !adminPassword) {
+        throw new Error('TEST_ADMIN_EMAIL and TEST_ADMIN_PASSWORD environment variables must be set.');
+    }
+
     test.setTimeout(60000);
-  await page.goto('http://localhost:3000/');
-  await page.waitForTimeout(4000);
-  await page.getByRole('link', { name: 'Sign In' }).click();
-  await page.getByRole('textbox', { name: 'Email Address' }).click();
-  await page.getByRole('textbox', { name: 'Email Address' }).fill('admin@gmail.com');
-  await page.getByRole('textbox', { name: 'Password' }).click();
-  await page.getByRole('textbox', { name: 'Password' }).fill('12345678');
-  await page.getByRole('button', { name: 'Sign In' }).click();
-  await page.waitForTimeout(2000);
-  await page.getByRole('link', { name: 'Shops' }).click();
-  await page.waitForTimeout(2000);
-  await page.locator('a > .w-full').first().click();
-  await page.getByRole('button', { name: 'Edit Shop Services' }).click();
-  await page.waitForTimeout(2000);
-  await page.getByRole('button', { name: 'Edit' }).nth(4).click();
-  await page.waitForTimeout(2000);
-  await page.getByRole('textbox', { name: 'Service Name Service Name' }).click();
-  await page.getByRole('textbox', { name: 'Service Name Service Name' }).fill('');
-  await page.getByRole('textbox', { name: 'Detail Detail' }).click();
-  await page.getByRole('textbox', { name: 'Detail Detail' }).fill('');
-  await page.getByText('DetailDetail').first().click();
-  await page.getByRole('spinbutton', { name: 'Price Price' }).click();
-  await page.getByRole('spinbutton', { name: 'Price Price' }).fill('');
-  await page.waitForTimeout(2000);
-  await page.getByText('Fill out the new service\'s information:Service NameService NameTarget').first().click();
-  await page.getByText('Fill out the new service\'s information:Service NameService NameTarget').first().click();
-  await page.getByText('Fill out the new service\'s information:Service NameService NameTarget').first().click();
-  await page.getByRole('button', { name: 'Confirm' }).first().click();
-  await page.waitForTimeout(2000);
-  await expect(page.getByRole('main')).toContainText('Please enter some information.');
-  await expect(page.getByText('Please enter some information.')).toBeVisible();
+    await page.goto('https://sabaai.vercel.app/');
+    await page.waitForTimeout(4000);
+    await page.getByRole('link', { name: 'Sign In' }).click();
+    await page.getByRole('textbox', { name: 'Email Address' }).click();
+    await page.getByRole('textbox', { name: 'Email Address' }).fill(adminEmail);
+    await page.getByRole('textbox', { name: 'Password' }).click();
+    await page.getByRole('textbox', { name: 'Password' }).fill(adminPassword);
+    await page.getByRole('button', { name: 'Sign In' }).click();
+    await page.waitForURL('https://sabaai.vercel.app/');
+    await page.waitForTimeout(2000);
+    await page.getByRole('link', { name: 'Shops' }).click();
+    await page.waitForURL('https://sabaai.vercel.app/shops');
+    await page.locator('text=View Details').first().waitFor();
+    await page.locator('a > .w-full').first().click();
+    await page.waitForTimeout(1000);
+    await page.getByRole('button', { name: 'Edit Shop Services' }).click();
+    await page.waitForTimeout(2000);
+    await page.getByRole('button', { name: 'Edit' }).last().click();
+    await page.waitForTimeout(2000);
+    await page.getByRole('textbox', { name: 'Service Name Service Name' }).click();
+    await page.getByRole('textbox', { name: 'Service Name Service Name' }).fill('');
+    await page.getByRole('textbox', { name: 'Detail Detail' }).click();
+    await page.getByRole('textbox', { name: 'Detail Detail' }).fill('');
+    // await page.getByText('DetailDetail').first().click();
+    await page.getByRole('spinbutton', { name: 'Price Price' }).click();
+    await page.getByRole('spinbutton', { name: 'Price Price' }).fill('');
+    await page.waitForTimeout(2000);
+    // await page.getByText('Fill out the new service\'s information:Service NameService NameTarget').first().click();
+    // await page.getByText('Fill out the new service\'s information:Service NameService NameTarget').first().click();
+    // await page.getByText('Fill out the new service\'s information:Service NameService NameTarget').first().click();
+    await page.getByRole('button', { name: 'Confirm' }).first().click();
+    await page.waitForTimeout(2000);
+    await expect(page.getByRole('main')).toContainText('Please enter some information.');
+    await expect(page.getByText('Please enter some information.')).toBeVisible();
 });

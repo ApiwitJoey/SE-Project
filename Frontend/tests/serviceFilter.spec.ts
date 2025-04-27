@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
 
-test('test', async ({ page }) => {
+test('Service filter', async ({ page }) => {
     test.setTimeout(60000);
     await page.goto('https://sabaai.vercel.app/');
     await page.getByRole('link', { name: 'Services', exact: true }).click();
+    await page.getByRole('link', { name: 'Book Now' }).first().waitFor();
     await expect(page.getByText('Abdominal Healing Massage')).toBeVisible();
     await expect(page.getByRole('main')).toContainText('Abdominal');
     await page.getByRole('textbox', { name: 'Service Name' }).click();
