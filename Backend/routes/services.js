@@ -14,14 +14,174 @@ const {
 
 // Protect is used to check if the user is logged in
 // authorize checks if the user has the required role
-router.get("/:id", getService);
+
+/** 
+ * @swagger
+ * components:
+ *   schemas:
+ *     Service:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: The unique ID of the service
+ *         service:
+ *           type: string
+ *           description: ID reference to the service
+ *         name:
+ *           type: string
+ *           description: Name of the service
+ *         price:
+ *           type: number
+ *           format: float
+ *           description: Price of the service
+ *         targetArea:
+ *           type: string
+ *           enum:
+ *             - Head & Shoulder
+ *             - Foot
+ *             - Neck-Shoulder-Back
+ *             - Chair
+ *             - Abdominal
+ *             - Hand & Arm
+ *             - Leg
+ *             - Full Body
+ *           description: Target body area for the service
+ *         massageType:
+ *           type: string
+ *           enum:
+ *             - Thai
+ *             - Swedish
+ *             - Oil/Aromatherapy
+ *             - Herbal Compress
+ *             - Deep Tissue
+ *             - Sports
+ *             - Office Syndrome
+ *             - Shiatsu
+ *             - Lomi-Lomi
+ *             - Trigger Point
+ *             - Others
+ *           description: Type of massage technique
+ *         details:
+ *           type: string
+ *           description: Additional details about the service
+ *       required:
+ *         - service
+ *         - name
+ *         - price       
+*/
+
+/**
+ * @swagger
+ * tags:
+ *   name: Services
+ *   description: The services managing API
+ */
+
+/**
+ * @swagger
+ * /services:
+ *   get:
+ *     summary: Returns the list of all the services
+ *     tags: [Services]
+ *     responses:
+ *       200:
+ *         description: The list of the services
+ *         content:
+ *           application/json: 
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Service'
+ */
 router.get("/", getServices);
+
+/**
+ * @swagger
+ * /services/{id}:
+ *   get:
+ *     summary: Get a service by ID
+ *     tags: [Services]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The service id
+ *     responses:
+ *       200:
+ *         description: The service description by id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Service'
+ *       404:
+ *         description: The service was not found
+ */
+router.get("/:id", getService);
+
+/**
+ * @swagger
+ * /services:
+ *   post:
+ *     summary: Create a new service
+ *     tags: [Services]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Service'
+ *     responses:
+ *       201:
+ *         description: The service was successfully created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Service'
+ *       400:
+ *         description: Bad request
+ */
 router.post(
   "/", [
     protect,
     authorize("admin", "user")
   ], 
-  createService); // from shops first
+  createService); // from services first
+
+
+/**
+ * @swagger
+ * /services/{id}:
+ *   put:
+ *     summary: Update a service by ID
+ *     tags: [Services]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The service id
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Service'
+ *     responses:
+ *       200:
+ *         description: The service was updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Service'
+ *       400:
+ *         description: Bad request
+ *       404:
+ *         description: Service not found
+ */
 router.put(
   "/:id", 
   [
@@ -29,6 +189,26 @@ router.put(
   authorize("admin", "user")
   ],
   updateService);
+
+/**
+ * @swagger
+ * /services/{id}:
+ *   delete:
+ *     summary: Delete the service by id
+ *     tags: [Services]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         desciption: The service id
+ *     responses:
+ *       200:
+ *         description: The service was deleted
+ *       404:
+ *         description: The service was not found
+ */
 router.delete("/:id", protect, authorize("admin", "user"), deleteService);
 
 module.exports = router;
