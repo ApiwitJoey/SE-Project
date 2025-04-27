@@ -157,7 +157,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
             return;
         }
 
-        if(!serviceName && !price && !detail && !targetArea && !massageType){
+        if(!serviceName || !price || !detail || !targetArea || !massageType){
             seteditedError("Please enter some information.");
             return;
         }
