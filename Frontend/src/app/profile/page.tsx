@@ -19,13 +19,13 @@ import userLogout from "@/libs/Auth/userLogout";
 export default function ProfilePage() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session ,update} = useSession();
   const token = session?.user?.token;
 
   const [user, setUser] = useState({
-    userName: "",
-    firstName: "",
-    lastName: "",
+    username: "",
+    firstname: "",
+    lastname: "",
     email: "",
     telephone: "",
     role: "",
@@ -33,9 +33,9 @@ export default function ProfilePage() {
   });
 
   const [formData, setFormData] = useState({
-    userName: "",
-    firstName: "",
-    lastName: "",
+    username: "",
+    firstname: "",
+    lastname: "",
     email: "",
     telephone: "",
     role: "",
@@ -65,9 +65,9 @@ export default function ProfilePage() {
         const data = await getMyProfile(token);
         setUser(data.data);
         setFormData({
-          userName: data.data.username || "",
-          firstName: data.data.firstname || "",
-          lastName: data.data.lastname || "",
+          username: data.data.username || "",
+          firstname: data.data.firstname || "",
+          lastname: data.data.lastname || "",
           email: data.data.email || "",
           telephone: data.data.telephone || "",
           role: data.data.role || "",
@@ -88,7 +88,7 @@ export default function ProfilePage() {
   const validatePhone = (phone: string) => /^0\d{8,9}$/.test(phone);
 
   const handleSave = () => {
-    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+    if (!formData.firstname.trim() || !formData.lastname.trim()) {
       setShowNameSnackbar(true);
       return;
     }
@@ -106,9 +106,9 @@ export default function ProfilePage() {
 
     try {
       const updatedUser = await updateMyProfile(token, {
-        username : formData.userName,
-        firstname: formData.firstName,
-        lastname: formData.lastName,
+        username : formData.username,
+        firstname: formData.firstname,
+        lastname: formData.lastname,
         email: formData.email,
         telephone: formData.telephone,
         role: formData.role,
@@ -119,6 +119,12 @@ export default function ProfilePage() {
         setUser(updatedUser.data);
         setIsEditing(false);
         setShowSuccessPopup(true);
+        await update({
+          user: {
+            ...session?.user,
+            username: updatedUser.data.username
+          }
+        });
         dispatch(updatedUser(updatedUser.data))
       } else {
         console.error("Error updating user data:", updatedUser.message);
@@ -132,9 +138,9 @@ export default function ProfilePage() {
 
   const handleCancel = () => {
     setFormData({
-      userName: user.userName || "",
-      firstName: user.firstName || "",
-      lastName: user.lastName || "",
+      username: user.username|| "",
+      firstname: user.firstname || "",
+      lastname: user.lastname || "",
       email: user.email,
       telephone: user.telephone || "",
       role: user.role,
@@ -213,13 +219,13 @@ export default function ProfilePage() {
           {isEditing ? (
             <input
               type="text"
-              name="userName"
-              value={formData.userName}
+              name="username"
+              value={formData.username}
               onChange={handleChange}
               className="border rounded px-3 py-2 mt-1"
             />
           ) : (
-            <span className="mt-1">{formData.userName}</span>
+            <span className="mt-1">{formData.username}</span>
           )}
           </h2>
           {formData.role === "admin" && (
@@ -241,13 +247,13 @@ export default function ProfilePage() {
               {isEditing ? (
                 <input
                   type="text"
-                  name="firstName"
-                  value={formData.firstName}
+                  name="firstname"
+                  value={formData.firstname}
                   onChange={handleChange}
                   className="border rounded px-3 py-2 mt-1"
                 />
               ) : (
-                <span className="mt-1">{formData.firstName}</span>
+                <span className="mt-1">{formData.firstname}</span>
               )}
             </div>
 
@@ -256,13 +262,13 @@ export default function ProfilePage() {
               {isEditing ? (
                 <input
                   type="text"
-                  name="lastName"
-                  value={formData.lastName}
+                  name="lastname"
+                  value={formData.lastname}
                   onChange={handleChange}
                   className="border rounded px-3 py-2 mt-1"
                 />
               ) : (
-                <span className="mt-1">{formData.lastName}</span>
+                <span className="mt-1">{formData.lastname}</span>
               )}
             </div>
           </div>

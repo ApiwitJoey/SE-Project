@@ -62,9 +62,9 @@ export default function ServiceList() {
             if (upperPriceFilter && service.price > upperPriceFilter) {
                 return false;
             }
-
+            console.log(service.name)
             // 4. Filter by name
-            if (nameFilter && !service.name.toLowerCase().includes(nameFilter.toLowerCase())) {
+            if (nameFilter && !(typeof service.name === 'string' && service.name.toLowerCase().includes(nameFilter.toLowerCase()))) {
                 return false;
             }
         
@@ -117,7 +117,7 @@ export default function ServiceList() {
                 <>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-4 w-full max-w-7xl mx-auto">
                         {currentServices.map((serviceItem) => (
-                            serviceItem.shop?._id ?
+                            (serviceItem.shop?._id && serviceItem.shop?.name) ?
                             <div
                                 className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-emerald-100 flex flex-col"
                                 key={serviceItem._id}
