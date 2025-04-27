@@ -1,0 +1,36 @@
+import { test, expect } from '@playwright/test';
+
+test('test', async ({ page }) => {
+    test.setTimeout(60000);
+  await page.goto('http://localhost:3000/');
+  await page.waitForTimeout(4000);
+  await page.getByRole('link', { name: 'Sign In' }).click();
+  await page.getByRole('textbox', { name: 'Email Address' }).click();
+  await page.getByRole('textbox', { name: 'Email Address' }).fill('admin@gmail.com');
+  await page.getByRole('textbox', { name: 'Password' }).click();
+  await page.getByRole('textbox', { name: 'Password' }).fill('12345678');
+  await page.getByRole('button', { name: 'Sign In' }).click();
+  await page.waitForTimeout(2000);
+  await page.getByRole('link', { name: 'Shops' }).click();
+  await page.waitForTimeout(2000);
+  await page.locator('a > .w-full').first().click();
+  await page.getByRole('button', { name: 'Edit Shop Services' }).click();
+  await page.waitForTimeout(2000);
+  await page.getByRole('button', { name: 'Edit' }).nth(4).click();
+  await page.waitForTimeout(2000);
+  await page.getByRole('textbox', { name: 'Service Name Service Name' }).click();
+  await page.getByRole('textbox', { name: 'Service Name Service Name' }).fill('');
+  await page.getByRole('textbox', { name: 'Detail Detail' }).click();
+  await page.getByRole('textbox', { name: 'Detail Detail' }).fill('');
+  await page.getByText('DetailDetail').first().click();
+  await page.getByRole('spinbutton', { name: 'Price Price' }).click();
+  await page.getByRole('spinbutton', { name: 'Price Price' }).fill('');
+  await page.waitForTimeout(2000);
+  await page.getByText('Fill out the new service\'s information:Service NameService NameTarget').first().click();
+  await page.getByText('Fill out the new service\'s information:Service NameService NameTarget').first().click();
+  await page.getByText('Fill out the new service\'s information:Service NameService NameTarget').first().click();
+  await page.getByRole('button', { name: 'Confirm' }).first().click();
+  await page.waitForTimeout(2000);
+  await expect(page.getByRole('main')).toContainText('Please enter some information.');
+  await expect(page.getByText('Please enter some information.')).toBeVisible();
+});
