@@ -39,23 +39,23 @@ test('US2_4 Valid', async ({ page }) => {
     // Fill in the service details (Valid case)
     await page.getByRole('textbox', { name: 'Service Name' }).click();
     await page.getByRole('textbox', { name: 'Service Name' }).fill('Test');
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(200);
     await page.getByRole('combobox', { name: 'Target Area' }).click();
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(200);
     await page.getByRole('option', { name: 'Foot' }).click();
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(200);
     await page.getByRole('combobox', { name: 'Massage Type' }).click();
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(200);
     await page.getByRole('option', { name: 'Thai' }).click();
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(200);
     await page.getByRole('textbox', { name: 'Detail' }).click();
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(200);
     await page.getByRole('textbox', { name: 'Detail' }).fill('Test');
     await page.getByRole('spinbutton', { name: 'Price' }).click();
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(200);
     await page.getByRole('spinbutton', { name: 'Price' }).fill('5');
     await page.getByRole('button', { name: 'Confirm' }).click();
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3500);
 
     // Check if the service is added successfully and delete it
     await page.locator('div.grid.grid-cols-1 > div.flex.flex-col').last().getByRole('button', { name: 'Delete' }).click();
