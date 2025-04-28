@@ -20,7 +20,7 @@ export default async function userRegister(userName:string,userFirstName:string,
         const data = await response.json();
     
         if(response.ok){
-            const data = await response.json();
+           
 
             await signIn('credentials', {
                 redirect: true,
