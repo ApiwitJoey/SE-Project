@@ -19,12 +19,12 @@ test('US2_4 Valid', async ({ page }) => {
     await page.getByRole('textbox', { name: 'Password' }).fill(adminPassword);
     await page.getByRole('button', { name: 'Sign In' }).click();
     await page.waitForURL('https://sabaai.vercel.app/');
-    await page.waitForTimeout(4000);
+    await page.waitForTimeout(2000);
     await page.getByRole('link', { name: 'Shops' }).click();
     await page.waitForURL('https://sabaai.vercel.app/shops');
     await page.locator('text=View Details').first().waitFor();
     await page.locator('a > .w-full').first().click();
-    await page.waitForTimeout(4000);
+    await page.waitForTimeout(2000);
     await page.getByRole('button', { name: 'Edit Shop Services' }).click();
     await page.getByRole('textbox', { name: 'Service Name' }).click();
     await page.getByRole('textbox', { name: 'Service Name' }).fill('Test');
