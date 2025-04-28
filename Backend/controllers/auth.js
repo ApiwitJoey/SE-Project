@@ -88,10 +88,10 @@ exports.getMe = async (req, res, next) => {
 // @access  Private
 exports.updateMe = async (req, res, next) => {
   try {
-    const { username, firstname, lastname, tel } = req.body;
+    const { username, firstname, lastname, telephone } = req.body;
 
     const existingUser = await User.findOne({ username });
-    const existingtelephone = await User.findOne({ tel });
+    const existingtelephone = await User.findOne({ telephone });
 
     if (existingUser && existingUser._id.toString() !== req.user._id.toString()) {
       return res.status(400).json({
@@ -111,7 +111,7 @@ exports.updateMe = async (req, res, next) => {
       username,
       firstname,
       lastname,
-      tel,
+      telephone,
     };
 
     const user = await User.findByIdAndUpdate(req.user._id, updates, {
