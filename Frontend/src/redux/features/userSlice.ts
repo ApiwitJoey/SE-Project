@@ -51,11 +51,18 @@ export const userSlice = createSlice({
             }
           }
           ,
+          updateUserProfile: (state, action: PayloadAction<Partial<userState>>) => {
+            return {
+              ...state,
+              ...action.payload,
+            };
+          },
+
         fetchUsers: (state, action:PayloadAction<User[]>) => {
             state.user = action.payload;
         }
     }
 });
 
-export const { addUser, removeUser, updateUser, fetchUsers, banUser, unbanUser } = userSlice.actions
+export const { addUser, removeUser, updateUser, fetchUsers, banUser, unbanUser ,updateUserProfile } = userSlice.actions
 export default userSlice.reducer

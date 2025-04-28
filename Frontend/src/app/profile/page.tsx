@@ -15,13 +15,15 @@ import deleteUser from "@/libs/Users/deleteUser";
 import { removeUser } from "@/redux/features/userSlice";
 import { signOut } from "next-auth/react";
 import userLogout from "@/libs/Auth/userLogout";
+import { updateUserProfile } from "@/redux/features/userSlice";
 
 export default function ProfilePage() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { data: session ,update} = useSession();
   const token = session?.user?.token;
-
+  const [error, setError] = useState("");
+  
   const [user, setUser] = useState({
     username: "",
     firstname: "",
@@ -46,7 +48,6 @@ export default function ProfilePage() {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [showNameSnackbar, setShowNameSnackbar] = useState(false);
-  const [showInvalidNameSnackbar, setShowInvalidNameSnackbar] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [popupProps, setPopupProps] = useState({
     title: "",
@@ -88,55 +89,33 @@ export default function ProfilePage() {
 
   const validatePhone = (phone: string) => /^0\d{8,9}$/.test(phone);
 
-const handleSave = async () => {
-  if (!formData.firstname.trim() || !formData.lastname.trim()) {
-    setShowNameSnackbar(true);
-    return;
-  }
-
-  if (!validatePhone(formData.telephone)) {
-    setShowSnackbar(true);
-    return;
-  }
-
-  try {
-    const response = await checkUsernameAvailability(formData.username);
-    if (!response.available) {
-      setShowInvalidNameSnackbar(true); 
+  const handleSave = () => {
+    if (!formData.firstname.trim() || !formData.lastname.trim()) {
+      setShowNameSnackbar(true);
       return;
     }
-  } catch (error) {
-    console.error("Error checking username availability:", error);
-  }
-
-  setShowConfirmBox(true);
-};
-
-  const checkUsernameAvailability = async (username: string) => {
-    try {
-      const response = await fetch(`/api/check-username?username=${username}`);
-      const data = await response.json();
-      return data; 
-    } catch (error) {
-      console.error("Error checking username availability:", error);
-      return { available: false };
+  
+    if (!validatePhone(formData.telephone)) {
+      setShowSnackbar(true);
+      return;
     }
+  
+    setShowConfirmBox(true);
   };
 
   const handleConfirmSave = async () => {
     if (!token) return;
-
+  
     try {
       const updatedUser = await updateMyProfile(token, {
-        username : formData.username,
+        username: formData.username,
         firstname: formData.firstname,
         lastname: formData.lastname,
         email: formData.email,
         telephone: formData.telephone,
         role: formData.role,
       });
-      
-
+  
       if (updatedUser.success) {
         setUser(updatedUser.data);
         setIsEditing(false);
@@ -144,15 +123,20 @@ const handleSave = async () => {
         await update({
           user: {
             ...session?.user,
-            username: updatedUser.data.username
-          }
+            username: updatedUser.data.username,
+          },
         });
-        dispatch(updatedUser(updatedUser.data))
+        dispatch(updateUserProfile(updatedUser.data));
+  
+        // Clear any previous errors after successful update
+        setError("");  // Clear error message after successful save
       } else {
         console.error("Error updating user data:", updatedUser.message);
+        setError(updatedUser.message || "Failed to update profile.");
       }
     } catch (error) {
       console.error("Error saving user data:", error);
+      setError("An unexpected error occurred.");
     } finally {
       setShowConfirmBox(false);
     }
@@ -230,6 +214,11 @@ const handleSave = async () => {
   return (
     <div className="min-h-screen pt-[80px] px-4 pb-16 bg-gradient-to-b from-white to-green-100 flex justify-center">
       <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-8 space-y-6">
+      {error && (
+            <div className="mb-4 bg-red-50 border-l-4 border-red-500 p-4">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          )}
       <div className="flex items-center gap-4 border-b border-gray-200 pb-4">
       <AccountCircleIcon
         className="text-green-700"
@@ -398,17 +387,6 @@ const handleSave = async () => {
                     Phone number must start with 0 and contain 9–10 digits.
                   </Alert>
                 </Snackbar>
-
-                <Snackbar
-                  open={showInvalidNameSnackbar}
-                  autoHideDuration={4000}
-                  onClose={() => setShowInvalidNameSnackbar(false)}
-                >
-                  <Alert severity="warning" sx={{ width: "100%" }}>
-                  This username is already taken, please use other username.
-                  </Alert>
-                </Snackbar>
-
                 <Snackbar
                   open={showNameSnackbar}
                   autoHideDuration={4000}
@@ -422,4 +400,3 @@ const handleSave = async () => {
             </div>
           );
         }
-        

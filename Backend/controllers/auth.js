@@ -88,12 +88,22 @@ exports.getMe = async (req, res, next) => {
 // @access  Private
 exports.updateMe = async (req, res, next) => {
   try {
+    const { username, firstname, lastname, telephone } = req.body;
+
+    const existingUser = await User.findOne({ username });
+
+    if (existingUser && existingUser._id.toString() !== req.user._id.toString()) {
+      return res.status(400).json({
+        success: false,
+        message: "The username is already in use.",
+      });
+    }
+
     const updates = {
-      username: req.body.username,
-      firstname: req.body.firstname,
-      lastname: req.body.lastname,
-      telephone: req.body.telephone,
-      
+      username,
+      firstname,
+      lastname,
+      telephone,
     };
 
     const user = await User.findByIdAndUpdate(req.user._id, updates, {
@@ -106,14 +116,16 @@ exports.updateMe = async (req, res, next) => {
       message: "Profile updated successfully",
       data: user,
     });
+
   } catch (err) {
-    console.log(err.stack);
+    console.error(err.stack);
     res.status(400).json({
       success: false,
       message: "Failed to update profile",
     });
   }
 };
+
 
 
 exports.logout = async (req, res, next) => {
