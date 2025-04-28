@@ -68,8 +68,11 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
         setAddingNewService(true);
         const parsedPrice = parseFloat(price);
 
-        if(parsedPrice < 0){
-            setError("Price cannot be negative. Please enter a valid amount.");
+        if(parsedPrice <= 0){
+            setError(parsedPrice === 0 
+                ? "Price cannot be zero" 
+                : "Negative prices are invalid"
+            );
             setAddingNewService(false);
             return;
         }
@@ -167,13 +170,60 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
         setError("");
         setSuccess("");
         setEditingSevice(true);
+        const parsedPrice = parseFloat(price);
+
         if(!currentEditedServiceId){
             seteditedError("No service selected for editing.");
             return;
         }
 
-        if(!serviceName || !price || !detail || !targetArea || !massageType){
-            seteditedError("Please enter some information.");
+        if(parsedPrice <= 0){
+            seteditedError(parsedPrice === 0 
+                ? "Price cannot be zero" 
+                : "Negative prices are invalid"
+            );
+            setEditingSevice(false);
+            return;
+        }
+
+        if(!serviceName){
+            seteditedError("Please enter a service name.");
+            setEditingSevice(false);
+            return;
+        }
+
+        if(!price){
+            seteditedError("Please enter a price.");
+            setEditingSevice(false);
+            return;
+        }
+
+        if(!detail){
+            seteditedError("Please enter the service details.");
+            setEditingSevice(false);
+            return;
+        }
+
+        if(!targetArea){
+            seteditedError("Please select a target area.");
+            setEditingSevice(false);
+            return;
+        }
+
+        if(!massageType){
+            seteditedError("Please select a massage type.");
+            setEditingSevice(false);
+            return;
+        }
+
+        if(!shopDetail?._id){
+            seteditedError("Shop ID not found. Cannot add a new service.");
+            setEditingSevice(false);
+            return;
+        }
+
+        if(!token){
+            seteditedError("Token not found. Cannot update service.");
             setEditingSevice(false);
             return;
         }
