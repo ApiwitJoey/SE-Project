@@ -96,7 +96,7 @@ const SignUp = () => {
           <form onSubmit={handleSignUp} className="space-y-6">
             <InputForm
               onInputChange={(value: string) => setUserName(value)}
-              labelText="UserName"
+              labelText="Username"
             />
             <InputForm
               onInputChange={(value: string) => setFirstName(value)}

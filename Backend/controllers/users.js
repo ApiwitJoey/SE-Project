@@ -63,11 +63,12 @@ exports.deleteUser = async (req, res, next) => {
     }
 
     if (req.user.id != user.id && req.user.role !== "admin") {
-      return res.status(400).json({
+      return res.status(401).json({
         success: false,
         message: "You are unauthorize to access this information",
       });
     }
+
     await sendEmail({
       email: user.email,
       subject: "[SABAAI Massage] Your Account Has Been Deleted",

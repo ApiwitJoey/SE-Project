@@ -17,9 +17,9 @@ exports.register = async (req, res, next) => {
       telephone,
     });
 
-    // const token = user.getSignedJwtToken();
-    // res.status(200).json({ success: true, token });
-    sendTokenResponse(user, 200, res);
+    const token = user.getSignedJwtToken();
+    res.status(200).json({ success: true, token });
+    
   } catch (err) {
     if (err.code === 11000) {
       const field = Object.keys(err.keyPattern)[0]; // e.g. 'email' or 'telephone'
@@ -272,7 +272,7 @@ exports.forgotPassword = async (req, res, next) => {
         OTP: otp,
         html: `<div style="max-width: 700px; margin: 40px auto; padding: 40px 30px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2); border: 1px solid #d1fae5;">
     <div style="text-align: center; margin-bottom: 30px;">
-      <img src="https://i.postimg.cc/4xrSTJhz/temp-Image-BMx-Ka-M.avif" alt="SABAAI Logo" style="max-width: 200px; border-radius: 10px;" />
+      <img src="https://i.imgur.com/Jg9yIyf.jpeg" alt="SABAAI Logo" style="max-width: 200px; border-radius: 10px;" />
     </div>
     
     <h2 style="text-align: center; font-size: 24px; color: #065f46; margin-bottom: 20px;">Hi ${user.name},</h2>
