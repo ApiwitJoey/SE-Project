@@ -35,6 +35,8 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
     const [shopDetail, setShopDetail] = useState<Shop | null>(null);
     const [services, setServices] = useState<Service[] | null>(null);
     const [loading, setLoading] = useState(true);
+    const [addingNewService, setAddingNewService] = useState(false);
+    const [editingSevice, setEditingSevice] = useState(false);
 
     if(role != "admin" || !token){
         router.push('/auth/signin2');
@@ -63,45 +65,54 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
     const addNewService = async ( serviceName:string, price:string, detail:string, targetArea:string, massageType:string ) => {
         setError("");
         setSuccess("");
+        setAddingNewService(true);
         const parsedPrice = parseFloat(price);
 
         if(parsedPrice < 0){
             setError("Price cannot be negative. Please enter a valid amount.");
+            setAddingNewService(false);
             return;
         }
 
         if(!serviceName){
             setError("Please enter a service name.");
+            setAddingNewService(false);
             return;
         }
 
         if(!price){
             setError("Please enter a price.");
+            setAddingNewService(false);
             return;
         }
 
         if(!detail){
             setError("Please enter the service details.");
+            setAddingNewService(false);
             return;
         }
 
         if(!targetArea){
             setError("Please select a target area.");
+            setAddingNewService(false);
             return;
         }
 
         if(!massageType){
             setError("Please select a massage type.");
+            setAddingNewService(false);
             return;
         }
 
         if(!shopDetail?._id){
             setError("Shop ID not found. Cannot add a new service.");
+            setAddingNewService(false);
             return;
         }
 
         if(!token){
             setError("Token not found. Cannot add a new service.");
+            setAddingNewService(false);
             return;
         }
 
@@ -115,6 +126,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
         }
         try {
             const response = await createService(shopDetail?._id, token, body);
+            // await new Promise(resolve => setTimeout(resolve, 5000)); For testing purpose
             setServices(prevServices => {
                 if(!prevServices) return prevServices;
                 return [...prevServices, response.data];
@@ -124,6 +136,8 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
         } catch (err) {
             const errMessage = err instanceof Error ? err.message : "Unexpected error occurred";
             setError(errMessage);
+        } finally{
+            setAddingNewService(false);
         }
     }
 
@@ -152,6 +166,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
     const handleEdit = async ( serviceName:string, price:string, detail:string, targetArea:string, massageType:string ) => {
         setError("");
         setSuccess("");
+        setEditingSevice(true);
         if(!currentEditedServiceId){
             seteditedError("No service selected for editing.");
             return;
@@ -159,6 +174,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
 
         if(!serviceName || !price || !detail || !targetArea || !massageType){
             seteditedError("Please enter some information.");
+            setEditingSevice(false);
             return;
         }
 
@@ -171,11 +187,13 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
             prevInfo.massageType === massageType
         ){
             seteditedError("No changes made to the service.");
+            setEditingSevice(false);
             return;
         };
 
         if(!token){
             seteditedError("Token not found. Cannot add a new service.");
+            setEditingSevice(false);
             return;
         }
 
@@ -189,6 +207,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
 
         try {
             const response = await updateService(currentEditedServiceId, token, body);
+            // await new Promise(resolve => setTimeout(resolve, 5000)); For testing purpose
             setServices(prevServices => {
                 if(!prevServices) return prevServices;
                 return prevServices.map(service => {
@@ -205,6 +224,8 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
         } catch (err) {
             const errMessage = err instanceof Error ? err.message : "Unexpected error occurred";
             setError(errMessage);
+        } finally {
+            setEditingSevice(false);
         }
     };
 
@@ -246,7 +267,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                         <p className="font-medium">{editedError}</p>
                     </div>
                 )}
-                <EditShopServiceForm onSubmit={handleEdit} header="Edit Sevice" prevInfo={prevInfo} />
+                <EditShopServiceForm onSubmit={handleEdit} header="Edit Sevice" prevInfo={prevInfo} isLoading={editingSevice} />
             </Modal>
 
             <div className="max-w-md mx-auto"> 
@@ -261,7 +282,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                         <p className="font-medium">{error}</p>
                     </div>
                 )}
-                <EditShopServiceForm onSubmit={addNewService} header="Add New Sevice" />
+                <EditShopServiceForm onSubmit={addNewService} header="Add New Sevice" isLoading={addingNewService} />
             </div>
 
             {/* Services Section */}

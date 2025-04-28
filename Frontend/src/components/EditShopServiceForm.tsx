@@ -1,6 +1,7 @@
 'use client'
 import { FilledInput, FormControl, InputAdornment, InputLabel, TextField, Select, MenuItem } from "@mui/material"
 import { useEffect, useState } from "react";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export interface PrevInfo {
     serviceName: string,
@@ -10,7 +11,7 @@ export interface PrevInfo {
     massageType: string
 }
 
-const EditShopServiceForm = ({ onSubmit, header, prevInfo } : { onSubmit: Function, header:string, prevInfo?:PrevInfo|undefined }) => {
+const EditShopServiceForm = ({ onSubmit, header, prevInfo, isLoading } : { onSubmit: Function, header:string, prevInfo?:PrevInfo|undefined, isLoading:boolean }) => {
 
     const [serviceName, setServiceName] = useState("");
     const [price, setPrice] = useState("");
@@ -213,11 +214,17 @@ const EditShopServiceForm = ({ onSubmit, header, prevInfo } : { onSubmit: Functi
                         className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg transition duration-300 font-medium flex items-center justify-center"
                         onClick={(e) => { e.preventDefault(); onSubmit(serviceName, price, detail, targetArea, massageType); }}
                     >
-                    Confirm
-                    <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                </button>
+                        <div className="flex flex-row items-center justify-center relative">
+                            Confirm
+                            {isLoading ? (
+                                <CircularProgress size={20} className="w-5 h-5 ml-2" color="inherit" />
+                            ) : (
+                                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                            )}
+                        </div>
+                    </button>
                 </div>
             </form>
         </div>
