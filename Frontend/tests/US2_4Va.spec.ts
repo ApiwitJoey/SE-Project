@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: './.env.local' });
 
+// * Admin create a service and delete it
 test('US2_4 Valid', async ({ page }) => {
     const adminEmail = process.env.TEST_ADMIN_EMAIL
     const adminPassword = process.env.TEST_ADMIN_PASSWORD
@@ -12,6 +13,8 @@ test('US2_4 Valid', async ({ page }) => {
     }
     test.setTimeout(60000);
     await page.goto('https://sabaai.vercel.app/');
+
+    // Signing in as admin
     await page.getByRole('link', { name: 'Sign In' }).click();
     await page.getByRole('textbox', { name: 'Email Address' }).click();
     await page.getByRole('textbox', { name: 'Email Address' }).fill(adminEmail);
@@ -20,12 +23,20 @@ test('US2_4 Valid', async ({ page }) => {
     await page.getByRole('button', { name: 'Sign In' }).click();
     await page.waitForURL('https://sabaai.vercel.app/');
     await page.waitForTimeout(2000);
+
+    // Navigating to the Shops page
     await page.getByRole('link', { name: 'Shops' }).click();
     await page.waitForURL('https://sabaai.vercel.app/shops');
+
+    // Click on the first shop's details
     await page.locator('text=View Details').first().waitFor();
     await page.locator('a > .w-full').first().click();
     await page.waitForTimeout(2000);
+
+    // Click on the "Edit Shop Services" button
     await page.getByRole('button', { name: 'Edit Shop Services' }).click();
+
+    // Fill in the service details (Valid case)
     await page.getByRole('textbox', { name: 'Service Name' }).click();
     await page.getByRole('textbox', { name: 'Service Name' }).fill('Test');
     await page.waitForTimeout(500);
@@ -45,8 +56,12 @@ test('US2_4 Valid', async ({ page }) => {
     await page.getByRole('spinbutton', { name: 'Price' }).fill('5');
     await page.getByRole('button', { name: 'Confirm' }).click();
     await page.waitForTimeout(2000);
+
+    // Check if the service is added successfully and delete it
     await page.locator('div.grid.grid-cols-1 > div.flex.flex-col').last().getByRole('button', { name: 'Delete' }).click();
     await page.waitForTimeout(500);
+
+    // Confirm the deletion
     await page.getByRole('button', { name: 'Confirm' }).nth(1).click();
     await page.waitForTimeout(2000);
     await expect(page.getByRole('main')).toContainText('Service deleted successfully!');

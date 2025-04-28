@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: './.env.local' });
 
+// * Search the shop using the shop name, opening time, and closing time
 test('US2_1 Valid', async ({ page }) => {
     const userEmail = process.env.TEST_USER_EMAIL
     const userPassword = process.env.TEST_USER_PASSWORD

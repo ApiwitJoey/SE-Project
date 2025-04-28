@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 
+// * Service filter
 test('Service filter', async ({ page }) => {
     test.setTimeout(60000);
     await page.goto('https://sabaai.vercel.app/');

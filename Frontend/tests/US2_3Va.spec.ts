@@ -16,6 +16,7 @@ const getRandomNumber = (min: number, max: number) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// * Admin edits a service with valid details
 test('US2_3 Valid', async ({ page }) => {
     const targetAreas = [
         'Head & Shoulder', 
@@ -82,33 +83,46 @@ test('US2_3 Valid', async ({ page }) => {
     await page.getByRole('button', { name: 'Edit' }).last().click();
     await page.waitForTimeout(2000);
 
+    // Get the next target area and fill in the nextTargetArea
     const currentTargetArea = await page.getByRole('combobox').nth(0).innerText();
     const idx1 = findIdx(targetAreas, currentTargetArea!);
     const nextTargetArea = targetAreas[(idx1 + 1) % targetAreas.length];
     await page.getByRole('combobox').nth(0).click();
     await page.getByRole('option', { name: nextTargetArea }).click();
 
+    // Get the next massage type and fill in the nextMassageType
     const currentMassageType = await page.getByRole('combobox').nth(1).innerText();
     const idx2 = findIdx(massageTypes, currentMassageType!);
     const nextMassageType = massageTypes[(idx2 + 1) % massageTypes.length];
     await page.getByRole('combobox').nth(1).click();
     await page.getByRole('option', { name: nextMassageType }).click();
 
+    // Get the random price and fill in the randomPrice
     const randomPrice = getRandomNumber(1, 100);
     await page.getByRole('spinbutton', { name: 'Price Price' }).click();
     await page.getByRole('spinbutton', { name: 'Price Price' }).fill(`${randomPrice}`);
+
+    // Fill in the service name using nextTargetArea and nextMassageType
     await page.getByRole('textbox', { name: 'Service Name Service Name' }).click();
     await page.getByRole('textbox', { name: 'Service Name Service Name' }).fill(`${nextTargetArea}_${nextMassageType}`);
     await page.waitForTimeout(2000);
 
+    // Fill in the detail using nextTargetArea
     await page.getByRole('textbox', { name: 'Detail Detail' }).click();
     await page.getByRole('textbox', { name: 'Detail Detail' }).fill(nextTargetArea);
 
     await page.getByRole('button', { name: 'Confirm' }).first().click();
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
 
+    // Confirm that the service is updated successfully
+    await expect(page.getByRole('main')).toContainText('Service updated successfully!');
+    const popup = page.locator('div.fixed.inset-0');
+    await popup.getByRole('button', { name: 'Close' }).click();
+
+    // verify the service is updated successfully
     await expect(page.locator('.flex.flex-col.bg-emerald-50.rounded-lg.p-5.border.border-emerald-100.hover\\:shadow-md.transition-shadow').last().getByRole('heading')).toContainText(`${nextTargetArea}_${nextMassageType}`);
     await expect(page.locator('.flex.flex-col.bg-emerald-50.rounded-lg.p-5.border.border-emerald-100.hover\\:shadow-md.transition-shadow').last().locator('.text-emerald-600.font-medium').nth(0)).toContainText(`${randomPrice}`);
     await expect(page.locator('.flex.flex-col.bg-emerald-50.rounded-lg.p-5.border.border-emerald-100.hover\\:shadow-md.transition-shadow').last().locator('.text-emerald-600.font-medium').nth(1)).toContainText(nextTargetArea);
     await expect(page.locator('.flex.flex-col.bg-emerald-50.rounded-lg.p-5.border.border-emerald-100.hover\\:shadow-md.transition-shadow').last().locator('.text-emerald-600.font-medium').nth(2)).toContainText(nextMassageType);
+    await page.waitForTimeout(3000);
 });

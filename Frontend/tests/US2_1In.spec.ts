@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 
+// * Attempt to serach for a shop without signing in
 test('US2_1 Invalid', async ({ page }) => {
   await page.goto('https://sabaai.vercel.app/');
   await page.getByRole('link', { name: 'Shops' }).click();
