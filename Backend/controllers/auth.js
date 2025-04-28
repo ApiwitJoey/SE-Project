@@ -17,9 +17,9 @@ exports.register = async (req, res, next) => {
       telephone,
     });
 
-    // const token = user.getSignedJwtToken();
-    // res.status(200).json({ success: true, token });
-    sendTokenResponse(user, 200, res);
+    const token = user.getSignedJwtToken();
+    res.status(200).json({ success: true, token });
+    
   } catch (err) {
     if (err.code === 11000) {
       const field = Object.keys(err.keyPattern)[0]; // e.g. 'email' or 'telephone'
