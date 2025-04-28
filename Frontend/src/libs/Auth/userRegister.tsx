@@ -18,6 +18,7 @@ export default async function userRegister(userName:string,userFirstName:string,
                 telephone: userTelephone
             })
         });
+        const data = await response.json();
     
         if(response.ok){
             const data = await response.json();
@@ -35,7 +36,10 @@ export default async function userRegister(userName:string,userFirstName:string,
             };
         }
         else {
-            return { success: false, message: "Registration failed." };
+            return {
+                success: false,
+                message: data.message || "Registration failed.",  
+            };
           }
     }
     catch(err){
