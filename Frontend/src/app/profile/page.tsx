@@ -46,6 +46,7 @@ export default function ProfilePage() {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [showNameSnackbar, setShowNameSnackbar] = useState(false);
+  const [showInvalidNameSnackbar, setShowInvalidNameSnackbar] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [popupProps, setPopupProps] = useState({
     title: "",
@@ -87,18 +88,39 @@ export default function ProfilePage() {
 
   const validatePhone = (phone: string) => /^0\d{8,9}$/.test(phone);
 
-  const handleSave = () => {
-    if (!formData.firstname.trim() || !formData.lastname.trim()) {
-      setShowNameSnackbar(true);
+const handleSave = async () => {
+  if (!formData.firstname.trim() || !formData.lastname.trim()) {
+    setShowNameSnackbar(true);
+    return;
+  }
+
+  if (!validatePhone(formData.telephone)) {
+    setShowSnackbar(true);
+    return;
+  }
+
+  try {
+    const response = await checkUsernameAvailability(formData.username);
+    if (!response.available) {
+      setShowInvalidNameSnackbar(true); 
       return;
     }
-  
-    if (!validatePhone(formData.telephone)) {
-      setShowSnackbar(true);
-      return;
+  } catch (error) {
+    console.error("Error checking username availability:", error);
+  }
+
+  setShowConfirmBox(true);
+};
+
+  const checkUsernameAvailability = async (username: string) => {
+    try {
+      const response = await fetch(`/api/check-username?username=${username}`);
+      const data = await response.json();
+      return data; 
+    } catch (error) {
+      console.error("Error checking username availability:", error);
+      return { available: false };
     }
-  
-    setShowConfirmBox(true);
   };
 
   const handleConfirmSave = async () => {
@@ -376,6 +398,17 @@ export default function ProfilePage() {
                     Phone number must start with 0 and contain 9–10 digits.
                   </Alert>
                 </Snackbar>
+
+                <Snackbar
+                  open={showInvalidNameSnackbar}
+                  autoHideDuration={4000}
+                  onClose={() => setShowInvalidNameSnackbar(false)}
+                >
+                  <Alert severity="warning" sx={{ width: "100%" }}>
+                  This username is already taken, please use other username.
+                  </Alert>
+                </Snackbar>
+
                 <Snackbar
                   open={showNameSnackbar}
                   autoHideDuration={4000}
