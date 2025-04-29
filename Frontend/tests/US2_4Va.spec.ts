@@ -13,6 +13,7 @@ test('US2_4 Valid', async ({ page }) => {
     }
     test.setTimeout(60000);
     await page.goto('https://sabaai.vercel.app/');
+    await page.waitForTimeout(3000);
 
     // Signing in as admin
     await page.getByRole('link', { name: 'Sign In' }).click();
