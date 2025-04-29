@@ -41,22 +41,6 @@ const swaggerOptions = {
   apis: ['./routes/*.js'], // <-- we'll write documentation inside route files
 };
 
-const startServer = async (mongoUri) => { // Receive mongoUri
-  try {
-    if (mongoUri) {
-      await connectDB(mongoUri); // Await the connection
-    }
-    const server = app.listen(5000, () => {
-      console.log('Server running in test mode on port 5000');
-    });
-     return server;
-  } catch (error) {
-    console.error('Error starting server:', error);
-    process.exit(1);
-  }
-};
-
-
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 app.use(express.json()); // Body parser
@@ -97,4 +81,4 @@ process.on("unhandledRejection", (err, promise) => {
   server.close(() => process.exit(1));
 });
 
-module.exports = { app, startServer };
+module.exports = { app };
