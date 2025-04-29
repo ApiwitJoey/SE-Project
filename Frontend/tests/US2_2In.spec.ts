@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: './.env.local' });
 
-// * Attempt to add a new service without signing in as admin
+// * Attempt to add a new service without all the required details
 test('US2_2 Invalid', async ({ page }) => {
     const adminEmail = process.env.TEST_ADMIN_EMAIL
     const adminPassword = process.env.TEST_ADMIN_PASSWORD
