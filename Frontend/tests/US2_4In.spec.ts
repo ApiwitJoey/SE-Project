@@ -6,7 +6,7 @@ test('US2_4 Invalid', async ({ page }) => {
 
     // Navigate the edit page of a shop without signing in
     await page.goto('https://sabaai.vercel.app/shops/680cf822f76c7d46afafd208/edit');
-    await page.waitForTimeout(750);
+    await page.waitForTimeout(1500);
 
     // Get redirect back to Sign In page
     await expect(page.locator('h2')).toContainText('Welcome Back');
@@ -14,4 +14,5 @@ test('US2_4 Invalid', async ({ page }) => {
     await expect(page.locator('form')).toContainText('Email Address');
     await expect(page.locator('form')).toContainText('Password');
     await expect(page.locator('div').filter({ hasText: /^Welcome BackSign in to your account$/ }).getByRole('img')).toBeVisible();
+    await page.waitForTimeout(4000);
 });

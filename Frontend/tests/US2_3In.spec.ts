@@ -57,6 +57,6 @@ test('US2_3 Invalid', async ({ page }) => {
     // Confirm the changes
     await page.getByRole('button', { name: 'Confirm' }).first().click();
     await page.waitForTimeout(2000);
-    await expect(page.getByRole('main')).toContainText('Please enter some information.');
-    await expect(page.getByText('Please enter some information.')).toBeVisible();
+    await expect(page.getByRole('main')).toContainText('Please enter a service name.');
+    await expect(page.getByText('Please enter a service name.')).toBeVisible();
 });
