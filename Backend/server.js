@@ -34,7 +34,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'https://se-backend-cyan.vercel.app/api/v1/',
+        url: 'https:/se-backend-cyan.vercel.app/api/v1/',
       },
     ],
   },
