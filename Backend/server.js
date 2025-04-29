@@ -41,6 +41,7 @@ const swaggerOptions = {
   apis: ['./routes/*.js'], // <-- we'll write documentation inside route files
 };
 
+
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 app.use(express.json()); // Body parser
@@ -81,4 +82,4 @@ process.on("unhandledRejection", (err, promise) => {
   server.close(() => process.exit(1));
 });
 
-module.exports = { app };
+module.exports = app;
