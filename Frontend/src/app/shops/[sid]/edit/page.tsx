@@ -317,7 +317,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                         <p className="font-medium">{editedError}</p>
                     </div>
                 )}
-                <EditShopServiceForm onSubmit={handleEdit} header="Edit Sevice" prevInfo={prevInfo} isLoading={editingSevice} />
+                <EditShopServiceForm onSubmit={handleEdit} header="Edit Service" prevInfo={prevInfo} isLoading={editingSevice} />
             </Modal>
 
             <div className="max-w-md mx-auto"> 
@@ -332,7 +332,7 @@ const EditShopService = ({ params } : { params: { sid: string }}) => {
                         <p className="font-medium">{error}</p>
                     </div>
                 )}
-                <EditShopServiceForm onSubmit={addNewService} header="Add New Sevice" isLoading={addingNewService} />
+                <EditShopServiceForm onSubmit={addNewService} header="Add New Service" isLoading={addingNewService} />
             </div>
 
             {/* Services Section */}

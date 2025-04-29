@@ -73,6 +73,10 @@ module.exports = router;
  *         - password
  *         - telephone
  *         - isBan
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
  */
 
 /**
@@ -84,6 +88,8 @@ module.exports = router;
  *   get:
  *     summary: Returns the list of all users
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: The list of users
@@ -116,6 +122,8 @@ module.exports = router;
  *   get:
  *     summary: Get user by id
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -147,6 +155,8 @@ module.exports = router;
  *   delete:
  *     summary: Delete user by id
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

@@ -55,6 +55,10 @@ module.exports = router;
  *           type: string
  *           format: date-time
  *           description: Timestamp when the reservation was created.
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
  */
 
 /**
@@ -66,6 +70,8 @@ module.exports = router;
  *   get:
  *     summary: Returns the list of all reservations
  *     tags: [Reservations]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: The list of reservations
@@ -95,6 +101,8 @@ module.exports = router;
  *   post:
  *     summary: Create new reservation
  *     tags: [Reservations]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -118,6 +126,8 @@ module.exports = router;
  *   get:
  *     summary: Get a reservation by id
  *     tags: [Reservations]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -143,6 +153,8 @@ module.exports = router;
  *   put:
  *     summary: Update a reservation by id
  *     tags: [Reservations]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -172,6 +184,8 @@ module.exports = router;
  *   delete:
  *     summary: Delete a reservation by id
  *     tags: [Reservations]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

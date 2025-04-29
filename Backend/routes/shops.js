@@ -27,6 +27,11 @@ router.use(
 /** 
  * @swagger
  * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     Shop:
  *       type: object
@@ -129,12 +134,36 @@ router.get("/:id", getShop);
  *   post:
  *     summary: Create a new shop
  *     tags: [Shops]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Shop'
+ *             type: object
+ *             required:
+ *               - name
+ *               - address
+ *               - telephone
+ *               - openTime
+ *               - closeTime
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: TITAN2
+ *               address:
+ *                 type: string
+ *                 example: bangkok
+ *               telephone:
+ *                 type: string
+ *                 example: 0123456789
+ *               openTime:
+ *                 type: string
+ *                 example: "13:00"
+ *               closeTime:
+ *                 type: string
+ *                 example: "22:00"
  *     responses:
  *       201:
  *         description: The shop was successfully created
@@ -153,6 +182,8 @@ router.post("/", protect, authorize("admin"), createShop);
  *   put:
  *     summary: Update a shop by the id
  *     tags: [Shops]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -186,6 +217,8 @@ router.put("/:id", protect, authorize("admin"), updateShop);
  *   delete:
  *     summary: Delete the shop by id
  *     tags: [Shops]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
