@@ -32,7 +32,7 @@ module.exports = router;
  * tags: 
  *   name: Authentication
  *   description: The authentication managing API
- * /register:
+ * /auth/register:
  *   post:
  *     summary: Register new user
  *     tags: [Authentication]
@@ -98,7 +98,7 @@ module.exports = router;
  *                 description: Username
  *       400:
  *         description: bad request
- * /login:
+ * /auth/login:
  *   post:
  *     summary: Log in
  *     tags: [Authentication]
@@ -148,10 +148,12 @@ module.exports = router;
  *         description: Invalid credentials
  *       403:
  *         description: This user is banned
- * /getme:
+ * /auth/getme:
  *   get:
  *     summary: Get user information
  *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Successfully login
@@ -175,6 +177,8 @@ module.exports = router;
  *   post:
  *     summary: Update user information
  *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -223,7 +227,7 @@ module.exports = router;
  *         description: Invalid credentials
  *       403:
  *         description: This user is banned
- * /ban/{id}:
+ * /auth/ban/{id}:
  *   put:
  *     summary: Ban user
  *     tags: [Authentication]
@@ -234,6 +238,8 @@ module.exports = router;
  *         schema:
  *           type: string
  *         description: The user id
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Successfully login
@@ -267,7 +273,7 @@ module.exports = router;
  *         description: User not found
  *       500:
  *         description: Internal server error
- * /unban/{id}:
+ * /auth/unban/{id}:
  *   put:
  *     summary: Unban user
  *     tags: [Authentication]
@@ -278,6 +284,8 @@ module.exports = router;
  *         schema:
  *           type: string
  *         description: The user id
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Successfully login
@@ -309,7 +317,7 @@ module.exports = router;
  *         description: User not found
  *       500:
  *         description: Internal server error
- * /logout:
+ * /auth/logout:
  *   get:
  *     summary: Log out
  *     tags: [Authentication]
@@ -324,7 +332,7 @@ module.exports = router;
  *               success:
  *                 type: boolean
  *                 description: Indicates whether the request was successful
- * /forgotpassword:
+ * /auth/forgotpassword:
  *   post:
  *     summary: Reset user's password
  *     tags: [Authentication]
@@ -356,7 +364,7 @@ module.exports = router;
  *         description: User not found
  *       500:
  *         description: Internal server error
- * /resetpassword/{otp}:
+ * /auth/resetpassword/{otp}:
  *   put:
  *     summary: Reset user's password
  *     tags: [Authentication]
@@ -392,7 +400,7 @@ module.exports = router;
  *                 description: Username
  *       400:
  *         description: bad request
- * /validate-otp/{resettoken}:
+ * /auth/validate-otp/{resettoken}:
  *   get:
  *     summary: Reset user's password
  *     tags: [Authentication]
@@ -419,4 +427,13 @@ module.exports = router;
  *                 description: Response message
  *       400:
  *         description: bad request
+ */
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
  */
