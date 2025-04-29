@@ -5,6 +5,7 @@ test('Service filter', async ({ page }) => {
     test.setTimeout(60000);
     await page.goto('https://sabaai.vercel.app/');
     // Navigate to the services page
+    await page.waitForTimeout(3000);
     await page.getByRole('link', { name: 'Services', exact: true }).click();
     await page.getByRole('link', { name: 'Book Now' }).first().waitFor();
     await expect(page.getByText('Abdominal Healing Massage')).toBeVisible();
@@ -46,5 +47,5 @@ test('Service filter', async ({ page }) => {
     await page.waitForTimeout(2000);
     await expect(page.getByRole('main')).toContainText('90');
     await page.getByRole('button', { name: 'Clear Filters' }).click();
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(4000);
 });
