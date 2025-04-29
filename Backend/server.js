@@ -34,11 +34,26 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'http://localhost:5000/api/v1/',
+        url: 'https://se-backend-cyan.vercel.app/api/v1/',
       },
     ],
   },
   apis: ['./routes/*.js'], // <-- we'll write documentation inside route files
+};
+
+const startServer = async (mongoUri) => { // Receive mongoUri
+  try {
+    if (mongoUri) {
+      await connectDB(mongoUri); // Await the connection
+    }
+    const server = app.listen(5000, () => {
+      console.log('Server running in test mode on port 5000');
+    });
+     return server;
+  } catch (error) {
+    console.error('Error starting server:', error);
+    process.exit(1);
+  }
 };
 
 
@@ -82,4 +97,4 @@ process.on("unhandledRejection", (err, promise) => {
   server.close(() => process.exit(1));
 });
 
-module.exports = app;
+module.exports = { app, startServer };
