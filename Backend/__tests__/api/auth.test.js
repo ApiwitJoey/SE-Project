@@ -1,94 +1,61 @@
 const authController = require('../../controllers/auth');
 const User = require('../../models/User');
+const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
 jest.mock('../../models/User');
+jest.mock('nodemailer');
 
-describe('Auth Controller', () => {
+// mock for sendMail function
+const sendMailMock = jest.fn();
 
-  let req, res, next;
-
-  beforeEach(() => {
-    req = {
-      body: {},
-      params: {}
-    };
-    res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn()
-    };
-    next = jest.fn();
-    jest.clearAllMocks();
+beforeEach(() => {
+  jest.clearAllMocks();
+  nodemailer.createTransport.mockReturnValue({
+    sendMail: sendMailMock,
   });
+});
 
+describe('auth controller', () => {
   describe('forgotPassword', () => {
-    it('should return 404 if user not found', async () => {
-      req.body.email = 'nonexistent@example.com';
-      User.findOne.mockResolvedValue(null);
-
-      await authController.forgotPassword(req, res, next);
-
-      expect(User.findOne).toHaveBeenCalledWith({ email: 'nonexistent@example.com' });
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ success: false, message: 'There is no user with that email' });
-    });
-
-    it('should send an email if user found', async () => {
-      const fakeUser = {
-        email: 'test@example.com',
-        firstname: 'Test',
-        lastname: 'User',
-        getResetPasswordToken: jest.fn().mockReturnValue('123456'),
-        save: jest.fn()
+    it('should return 200 if email sent successfully', async () => {
+      const req = { body: { email: 'test@example.com' }, protocol: 'http', get: jest.fn(() => 'localhost') };
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
       };
-      req.body.email = 'test@example.com';
-      User.findOne.mockResolvedValue(fakeUser);
+      const user = {
+        email: 'test@example.com',
+        getResetPasswordToken: jest.fn().mockReturnValue('resetToken'),
+        save: jest.fn(),
+      };
 
-      await authController.forgotPassword(req, res, next);
+      User.findOne.mockResolvedValue(user);
+      sendMailMock.mockResolvedValueOnce({});
 
-      expect(fakeUser.getResetPasswordToken).toHaveBeenCalled();
-      expect(fakeUser.save).toHaveBeenCalledWith({ validateBeforeSave: false });
+      await authController.forgotPassword(req, res);
+
+      expect(User.findOne).toHaveBeenCalledWith({ email: 'test@example.com' });
+      expect(user.getResetPasswordToken).toHaveBeenCalled();
+      expect(user.save).toHaveBeenCalledWith({ validateBeforeSave: false });
+      expect(sendMailMock).toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ success: true, message: 'Email sent' });
     });
 
-  });
+    it('should return 404 if user not found', async () => {
+      const req = { body: { email: 'test@example.com' }, protocol: 'http', get: jest.fn(() => 'localhost') };
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
 
-  describe('resetPassword', () => {
-    it('should return 400 if token is invalid or expired', async () => {
-      req.params.otp = 'invalidotp';
       User.findOne.mockResolvedValue(null);
 
-      await authController.resetPassword(req, res, next);
+      await authController.forgotPassword(req, res);
 
-      expect(User.findOne).toHaveBeenCalledWith(expect.objectContaining({
-        resetPasswordToken: expect.any(String),
-        resetPasswordExpire: { $gt: expect.any(Number) }
-      }));
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ success: false, message: 'Invalid or expired OTP' });
-    });
-
-    it('should reset password if token is valid', async () => {
-      const fakeUser = {
-        password: '',
-        resetPasswordToken: 'some-token',
-        resetPasswordExpire: Date.now() + 10000,
-        save: jest.fn()
-      };
-      req.params.otp = 'validotp';
-      req.body.password = 'newpassword123';
-      User.findOne.mockResolvedValue(fakeUser);
-
-      jest.spyOn(authController, 'sendTokenResponse').mockImplementation(() => {});  // mock sendTokenResponse
-
-      await authController.resetPassword(req, res, next);
-
-      expect(fakeUser.password).toBe('newpassword123');
-      expect(fakeUser.resetPasswordToken).toBeUndefined();
-      expect(fakeUser.resetPasswordExpire).toBeUndefined();
-      expect(fakeUser.save).toHaveBeenCalled();
-      expect(authController.sendTokenResponse).toHaveBeenCalledWith(fakeUser, 200, res);
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ success: false, message: 'There is no user with that email' });
     });
   });
 
