@@ -14,6 +14,7 @@ test('US2_1 Valid', async ({ page }) => {
 
     test.setTimeout(60000);
     await page.goto('https://sabaai.vercel.app/');
+    await page.waitForTimeout(2000);
     // Sign in to the application
     await page.getByRole('link', { name: 'Sign In' }).click();
     await page.waitForURL('https://sabaai.vercel.app/auth/signin2');
