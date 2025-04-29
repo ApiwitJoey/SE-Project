@@ -18,6 +18,11 @@ const {
 /** 
  * @swagger
  * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     Service:
  *       type: object
@@ -25,6 +30,10 @@ const {
  *         _id:
  *           type: string
  *           description: The unique ID of the service
+ *         shop:
+ *           type: string
+ *           description: ObjectId reference to the shop
+ *           example: 660f4eced3e1a23e4c2c4d7e
  *         service:
  *           type: string
  *           description: ID reference to the service
@@ -127,12 +136,63 @@ router.get("/:id", getService);
  *   post:
  *     summary: Create a new service
  *     tags: [Services]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: shopId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The service id
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Service'
+ *             type: object
+ *             required:
+ *               - name
+ *               - price
+ *               - targetArea
+ *               - massageType
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Thai Head Massage
+ *               price:
+ *                 type: number
+ *                 example: 450
+ *               targetArea:
+ *                 type: string
+ *                 enum:
+ *                   - Head & Shoulder
+ *                   - Foot
+ *                   - Neck-Shoulder-Back
+ *                   - Chair
+ *                   - Abdominal
+ *                   - Hand & Arm
+ *                   - Leg
+ *                   - Full Body
+ *                 example: Head & Shoulder
+ *               massageType:
+ *                 type: string
+ *                 enum:
+ *                   - Thai
+ *                   - Swedish
+ *                   - Oil/Aromatherapy
+ *                   - Herbal Compress
+ *                   - Deep Tissue
+ *                   - Sports
+ *                   - Office Syndrome
+ *                   - Shiatsu
+ *                   - Lomi-Lomi
+ *                   - Trigger Point
+ *                   - Others
+ *                 example: Thai
+ *               details:
+ *                 type: string
+ *                 example: A soothing massage technique focused on the head and shoulders.
  *     responses:
  *       201:
  *         description: The service was successfully created
@@ -157,9 +217,11 @@ router.post(
  *   put:
  *     summary: Update a service by ID
  *     tags: [Services]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: shopId
  *         required: true
  *         schema:
  *           type: string
@@ -169,7 +231,54 @@ router.post(
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Service'
+ *             type: object
+ *             required:
+ *               - shop
+ *               - name
+ *               - price
+ *               - targetArea
+ *               - massageType
+ *             properties:
+ *               shop:
+ *                 type: string
+ *                 description: ObjectId of the shop
+ *                 example: 662f4eced3e1a23e4c2c4d7e
+ *               name:
+ *                 type: string
+ *                 example: Thai Head Massage
+ *               price:
+ *                 type: number
+ *                 example: 450
+ *               targetArea:
+ *                 type: string
+ *                 enum:
+ *                   - Head & Shoulder
+ *                   - Foot
+ *                   - Neck-Shoulder-Back
+ *                   - Chair
+ *                   - Abdominal
+ *                   - Hand & Arm
+ *                   - Leg
+ *                   - Full Body
+ *                 example: Head & Shoulder
+ *               massageType:
+ *                 type: string
+ *                 enum:
+ *                   - Thai
+ *                   - Swedish
+ *                   - Oil/Aromatherapy
+ *                   - Herbal Compress
+ *                   - Deep Tissue
+ *                   - Sports
+ *                   - Office Syndrome
+ *                   - Shiatsu
+ *                   - Lomi-Lomi
+ *                   - Trigger Point
+ *                   - Others
+ *                 example: Thai
+ *               details:
+ *                 type: string
+ *                 example: A soothing massage technique focused on the head and shoulders.
  *     responses:
  *       200:
  *         description: The service was updated successfully
@@ -196,6 +305,8 @@ router.put(
  *   delete:
  *     summary: Delete the service by id
  *     tags: [Services]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
