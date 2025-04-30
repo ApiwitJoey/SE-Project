@@ -26,7 +26,7 @@ const ReservationCart = () => {
         const userInfo = userArr.find((user) => user._id === reservation.user);
         return {
           ...reservation,
-          userName: userInfo ? userInfo.name : "Unknown User",
+          userName: userInfo ? userInfo.username : "Unknown User",
         };
     });
 
@@ -84,30 +84,28 @@ const ReservationCart = () => {
                 >
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-3 sm:mb-4">
                         <div>
-                            <p className="text-xs sm:text-sm text-emerald-600">Date</p>
+                            <p className="text-xs sm:text-sm font-bold text-emerald-600">Date</p>
                             <p className="text-sm sm:text-base font-medium text-emerald-800">{connectedReservation.date}</p>
                         </div>
                         <div>
-                            <p className="text-xs sm:text-sm text-emerald-600">Spa Location</p>
+                            <p className="text-xs sm:text-sm font-bold text-emerald-600">Spa Location</p>
                             <p className="text-sm sm:text-base font-medium text-emerald-800 truncate">
                                 {connectedReservation.shop?.name || "Not specified"}
                             </p>
                         </div>
                         <div>
-                            <p className="text-xs sm:text-sm text-emerald-600">
+                            <p className="text-xs sm:text-sm font-bold text-emerald-600">
                                 {session?.user.role === 'admin' ? "Client" : "Your Name"}
                             </p>
                             <p className="text-sm sm:text-base font-medium text-emerald-800 truncate">
-                                {session?.user.role === 'admin' 
-                                    ? connectedReservation.userName 
-                                    : session?.user.username}
+                                {connectedReservation.userName}
                             </p>
                         </div>
 
                         {
                              connectedReservation.service ? 
                              <div>
-                                 <p className="text-xs sm:text-sm text-emerald-600">
+                                 <p className="text-xs sm:text-sm font-bold text-emerald-600">
                                      Service
                                  </p>
                                  <div className="flex flex-col">
@@ -117,8 +115,8 @@ const ReservationCart = () => {
                                      <p className="text-xs sm:text-sm font-medium text-emerald-700 truncate">
                                          {connectedReservation.service.details}
                                      </p>
-                                     <p className="text-xs sm:text-sm font-medium text-emerald-800">
-                                         {connectedReservation.service.price}
+                                     <p className="text-xs sm:text-sm font-bold text-yellow-600">
+                                         {'$ ' + connectedReservation.service.price}
                                      </p>
                                  </div>
                              </div>

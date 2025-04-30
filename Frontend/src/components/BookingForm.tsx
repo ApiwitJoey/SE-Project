@@ -20,6 +20,26 @@ const BookingForm = ({ onSubmit, defaultShopId, defaultServiceId, defaultDate }:
     const [selectedShopId, setSelectedShopId] = useState<string | null>(defaultShopId || null);
     const [date, setDate] = useState<Dayjs | null>(null);
 
+    // min max time
+    const [minTime, setMinTime] = useState<Dayjs>(dayjs().startOf('day'));
+    const [maxTime, setMaxTime] = useState<Dayjs>(dayjs().endOf('day'));
+
+    const updateShopTimeRange = async (shopId?: string) => {
+        const shop = shops?.find(s => s._id === shopId);
+        if (shop) {
+            // Parse time strings and combine with current date
+            const today = dayjs().format('YYYY-MM-DD');
+            const openTime = dayjs(`${today} ${shop.openTime}`);
+            const closeTime = dayjs(`${today} ${shop.closeTime}`);
+            
+            setMinTime(openTime);
+            setMaxTime(closeTime);
+        } else {
+            setMinTime(dayjs().startOf('day'));
+            setMaxTime(dayjs().endOf('day'));
+        }
+    };
+
     const [loading, setLoading] = useState(true);
 
     const { data: session } = useSession();
@@ -47,9 +67,11 @@ const BookingForm = ({ onSubmit, defaultShopId, defaultServiceId, defaultDate }:
                 setShops(response.data);
                 if (!defaultShopId && response.data.length > 0) {
                     setSelectedShopId(response.data[0]._id);
+                    updateShopTimeRange(response.data[0]._id);
                     await fetchService(response.data[0]._id);
                 }
                 else if(defaultShopId){
+                    updateShopTimeRange(defaultShopId);
                     await fetchService(defaultShopId)
                 }
 
@@ -65,10 +87,10 @@ const BookingForm = ({ onSubmit, defaultShopId, defaultServiceId, defaultDate }:
     }, []);
 
     useEffect(() => {
-        if(selectedShopId){
-            fetchService(selectedShopId);
+        if (selectedShopId) {
+            updateShopTimeRange(selectedShopId);
         }
-    }, [selectedShopId]);
+    }, [selectedShopId, shops]);
 
     if (loading) {
         return (
@@ -90,7 +112,7 @@ const BookingForm = ({ onSubmit, defaultShopId, defaultServiceId, defaultDate }:
                         labelId="shop-select-label"
                         id="shop-select"
                         value={selectedShopId}
-                        onChange={(e) => setSelectedShopId(e.target.value as string)}
+                        onChange={(e) => { setSelectedShopId(e.target.value as string); }}
                         className="w-full bg-white text-emerald-900 rounded-lg"
                         sx={{
                             '& .MuiOutlinedInput-notchedOutline': {
@@ -176,6 +198,8 @@ const BookingForm = ({ onSubmit, defaultShopId, defaultServiceId, defaultDate }:
                             className="w-full"
                             value={date} 
                             onChange={(newDate) => setDate(newDate)}
+                            minTime={minTime}
+                            maxTime={maxTime}
                             sx={{
                                 '& .MuiOutlinedInput-root': {
                                     '& fieldset': {
