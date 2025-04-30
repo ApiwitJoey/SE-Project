@@ -132,7 +132,7 @@ router.get("/:id", getService);
 
 /**
  * @swagger
- * /services:
+ * /shops/{shopId}/services:
  *   post:
  *     summary: Create a new service
  *     tags: [Services]
@@ -221,7 +221,7 @@ router.post(
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: shopId
+ *         name: id
  *         required: true
  *         schema:
  *           type: string
@@ -233,16 +233,11 @@ router.post(
  *           schema:
  *             type: object
  *             required:
- *               - shop
  *               - name
  *               - price
  *               - targetArea
  *               - massageType
  *             properties:
- *               shop:
- *                 type: string
- *                 description: ObjectId of the shop
- *                 example: 662f4eced3e1a23e4c2c4d7e
  *               name:
  *                 type: string
  *                 example: Thai Head Massage
