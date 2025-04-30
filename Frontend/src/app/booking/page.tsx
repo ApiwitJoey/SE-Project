@@ -19,13 +19,21 @@ const BookingPage = () => {
   const defaultServiceId = searchParams.get("serviceId") || null;
   const dispatch = useDispatch<AppDispatch>();
 
-  const handleSubmit = async (date:string, selectedShopId:string, selectedServiceId: string) => {
+  const handleSubmit = async (date: string, selectedShopId: string, selectedServiceId: string, minTime: any, maxTime: any) => {
     if (dayjs(date).isBefore(dayjs(), 'day')) {
       setError("Cannot select a past date.");
       return;
     }
 
-    if(!selectedServiceId) {
+    if (minTime && maxTime) {
+      const selected = dayjs(date);
+      if (selected.isBefore(dayjs(minTime)) || selected.isAfter(dayjs(maxTime))) {
+        setError("Please select a time within the store's opening hours.");
+        return;
+      }
+    }
+
+    if (!selectedServiceId) {
       setError("You need to select a service");
       return;
     }
@@ -65,7 +73,7 @@ const BookingPage = () => {
         )}
         
         <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8 border border-emerald-100">
-          <BookingForm onSubmit={handleSubmit} defaultShopId={defaultShopId} defaultServiceId={defaultServiceId}/>
+          <BookingForm onSubmit={handleSubmit} defaultShopId={defaultShopId} defaultServiceId={defaultServiceId} />
         </div>
       </div>
     </div>

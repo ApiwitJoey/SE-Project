@@ -85,7 +85,17 @@ const ReservationCart = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-3 sm:mb-4">
                         <div>
                             <p className="text-xs sm:text-sm font-bold text-emerald-600">Date</p>
-                            <p className="text-sm sm:text-base font-medium text-emerald-800">{connectedReservation.date}</p>
+                            <p className="text-sm sm:text-base font-medium text-emerald-800">
+                                {new Date(connectedReservation.date).toLocaleString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false,
+                                    timeZone: 'Asia/Bangkok'
+                                })}
+                            </p>
                         </div>
                         <div>
                             <p className="text-xs sm:text-sm font-bold text-emerald-600">Spa Location</p>

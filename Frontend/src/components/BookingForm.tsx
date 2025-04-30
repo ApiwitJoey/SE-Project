@@ -218,7 +218,7 @@ const BookingForm = ({ onSubmit, defaultShopId, defaultServiceId, defaultDate }:
                 <button 
                     type="submit" 
                     className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg transition duration-300 font-medium flex items-center justify-center"
-                    onClick={(e) => { e.preventDefault(); onSubmit(date, selectedShopId, serviceId); }}
+                    onClick={(e) => { e.preventDefault(); onSubmit(date, selectedShopId, serviceId, minTime, maxTime); }}
                 >
                     Confirm Booking
                     <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
